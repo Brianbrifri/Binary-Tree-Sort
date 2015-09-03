@@ -15,7 +15,7 @@ int main() {
 	//Create an instance of the binary tree
 	BinaryTree tree;
 
-	//While loop to get the file name and open it
+	//While loop to get file name and open it
 	while(1) {
 	
 		cout << "What is the name of the file: ";
