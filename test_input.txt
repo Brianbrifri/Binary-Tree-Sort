@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 aaigsvsdgabbabfeeeeeeeoe egi ytyk kgig  afafa affhjjsaadghhhd sdfhh h asd
 wdad
 
@@ -6,3 +7,13 @@ falskjflkjoaik  iaojofu oao o
 ifaohf
 8832
 iaoiufoua
+=======
+aaigsvsdgabbabfeeeeeeeoe egi ytyk kgig  afafa affhjjsaadghhhd sdfhh h asd
+wdad
+
+falskjflkjoaik  iaojofu oao o
+
+ifaohf
+8832
+iaoiufoua
+>>>>>>> 483cbd235a72738d1276fba427dc986a690e473a
