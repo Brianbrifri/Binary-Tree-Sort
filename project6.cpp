@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #include<iostream>
 #include<cstdlib>
 #include<fstream>
@@ -302,4 +301,3 @@ int main() {
 
 	return 0;
 }
->>>>>>> 483cbd235a72738d1276fba427dc986a690e473a
