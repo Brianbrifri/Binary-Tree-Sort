@@ -73,3 +73,22 @@ void BinaryTree::displayInOrder(TreeNode *nodePtr) const {
 	}
 }
 
+void BinaryTree::displayVisual(TreeNode *ptr, int level) const
+{
+    int i;
+    if (ptr != NULL)
+    {
+        displayVisual(ptr->right, level+1);
+        cout<<endl;
+        if (ptr == root)
+            cout<<"Root->:  ";
+        else
+        {
+            for (i = 0;i < level;i++)
+                cout<<"       ";
+    }
+        cout<<ptr->value;
+        displayVisual(ptr->left, level+1);
+    }
+}
+
