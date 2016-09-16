@@ -18,10 +18,11 @@ void BinaryTree::insert(TreeNode *&nodePtr, TreeNode *&newNode) {
 		}
 	else {
 		nodePtr->counter++;
+    cout << "Increasing counter" << endl;
 	}
 }
 
-void BinaryTree::insertNode(string str) {
+void BinaryTree::insertNode(int str) {
 
 	TreeNode *newNode;
 
@@ -46,7 +47,7 @@ void BinaryTree::destroySubTree(TreeNode *nodePtr) {
 	}
 }
 
-bool BinaryTree::searchNode(string str) {
+bool BinaryTree::searchNode(int str) {
 
 	TreeNode *nodePtr = root;
 

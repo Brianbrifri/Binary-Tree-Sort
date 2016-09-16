@@ -32,32 +32,18 @@ int main(int argc, char *argv[]) {
 	file.close();
 }
 	
-	//For loop to get rid of the spaces for easier analysis
-	for(int i = 0; i < preFormStr.size(); i++) {
-		
-		string temp;
-
-		//If the sting has a space, increment the iterator
-		if(preFormStr[i] == ' ' || preFormStr[i] == '\0') {
-			i++;
-		}
-
-		//If the string has a character, append it to the formatted string
-		else {
-			temp = preFormStr[i];
-			postFormStr.append(temp);
-		}
-		
-	}
-
-	cout << "Post formatted: " << postFormStr << endl;
-
-
 	//For loop goes through post formatted string and 
 	//inserts nodes
-	for(int i = 0; i < postFormStr.size(); i++) {
-    string temp1 = "";
-    tree.insertNode(temp1);
+	for(int i = 0; i <= preFormStr.size(); i++) {
+    if(preFormStr[i] != ' ') {
+      string temp1;
+      temp1 = preFormStr[i];
+      temp2.append(temp1);
+    }
+    else {
+      tree.insertNode(atoi(temp2.c_str()));
+      temp2 = ""; 
+    }
   }
 	
 	tree.displayInOrder();

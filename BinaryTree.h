@@ -10,7 +10,7 @@ class BinaryTree {
 	private:
 		struct TreeNode {
 		
-			string value;
+			int value;
 			int counter;
 			TreeNode *left;
 			TreeNode *right;
@@ -37,8 +37,8 @@ class BinaryTree {
 		}
 
 		//Binary Tree Operations
-		void insertNode(string);
-		bool searchNode(string);
+		void insertNode(int);
+		bool searchNode(int);
 		void remove(string);
     void displayVisual() const {
       displayVisual(root, 1);
