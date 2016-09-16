@@ -34,16 +34,23 @@ int main(int argc, char *argv[]) {
 	
 	//For loop goes through post formatted string and 
 	//inserts nodes
-	for(int i = 0; i <= preFormStr.size(); i++) {
+  cout << preFormStr.size() << endl;
+	for(int i = 0; i < preFormStr.size(); i++) {
     if(preFormStr[i] != ' ') {
       string temp1;
       temp1 = preFormStr[i];
       temp2.append(temp1);
+      if(i == preFormStr.size() - 1 && temp2.size() != 0) {
+        tree.insertNode(atoi(temp2.c_str()));
+      } 
     }
     else {
-      tree.insertNode(atoi(temp2.c_str()));
-      temp2 = ""; 
+      if(temp2.size() != 0) {
+        tree.insertNode(atoi(temp2.c_str()));
+        temp2 = ""; 
+      }
     }
+    
   }
 	
 	tree.displayInOrder();
