@@ -18,7 +18,6 @@ void BinaryTree::insert(TreeNode *&nodePtr, TreeNode *&newNode) {
 		}
 	else {
 		nodePtr->counter++;
-    cout << "Increasing counter" << endl;
 	}
 }
 
@@ -65,31 +64,93 @@ bool BinaryTree::searchNode(int str) {
 	return false;
 }
 
-void BinaryTree::displayInOrder(TreeNode *nodePtr) const {
+void BinaryTree::display(string fileName) {
+  string preFileName = fileName;
+  preFileName.append(".preorder");
+  string postFileName = fileName;
+  postFileName.append(".postorder");
+  string orderFileName = fileName;
+  orderFileName.append(".inorder");
+
+  cout << "filenames: " << preFileName << ", " << postFileName << ", " << orderFileName << endl;
+
+  ofstream preFile, postFile, orderFile;
+
+  preFile.open(preFileName.c_str());
+  postFile.open(postFileName.c_str());
+  orderFile.open(orderFileName.c_str());
+
+  cout << "PreOrder traversal: \n";
+  BinaryTree::displayPreOrder(root, preFile);
+  cout << "\n";
+  cout << "InOrder traversal: \n";
+  BinaryTree::displayInOrder(root, orderFile);
+  cout << "\n";
+  cout << "PostOrder traversal: \n";
+  BinaryTree::displayPostOrder(root, postFile);
+  cout << "\n";
+  cout << "Visual Display: \n";
+  BinaryTree::displayVisual(root, 1);
+  cout << "\n";
+
+  preFile.close();
+  postFile.close();
+  orderFile.close();
+}
+
+void BinaryTree::displayPreOrder(TreeNode *nodePtr, ofstream &file) {
+	if(nodePtr) {
+	  cout << nodePtr->value << ": " << nodePtr->counter << endl;
+		file << nodePtr->value << ": " << nodePtr->counter << endl;
+ 		displayPreOrder(nodePtr->left, file);
+	  displayPreOrder(nodePtr->right, file);
+ }
+
+}
+
+void BinaryTree::displayPostOrder(TreeNode *nodePtr, ofstream &file) {
+	if(nodePtr) {
+		displayPostOrder(nodePtr->left, file);
+	  displayPostOrder(nodePtr->right, file);
+	  cout << nodePtr->value << ": " << nodePtr->counter << endl;
+		file << nodePtr->value << ": " << nodePtr->counter << endl;
+  }
+
+}
+
+void BinaryTree::displayInOrder(TreeNode *nodePtr, ofstream &file) {
 
 	if(nodePtr) {
-		displayInOrder(nodePtr->left);
+		displayInOrder(nodePtr->left, file);
 		cout << nodePtr->value << ": " << nodePtr->counter << endl;
-		displayInOrder(nodePtr->right);
+		file << nodePtr->value << ": " << nodePtr->counter << endl;
+		displayInOrder(nodePtr->right, file);
 	}
 }
 
-void BinaryTree::displayVisual(TreeNode *ptr, int level) const
-{
-    int i;
-    if (ptr != NULL)
-    {
-        displayVisual(ptr->right, level+1);
-        cout<<endl;
-        if (ptr == root)
-            cout<<"Root->:  ";
-        else
-        {
-            for (i = 0;i < level;i++)
-                cout<<"       ";
-    }
-        cout<<ptr->value;
-        displayVisual(ptr->left, level+1);
-    }
+void BinaryTree::displayVisual(TreeNode *ptr, int level) {
+
+  if(ptr == NULL) {
+    return;
+  }
+  for(int i = 0; i < level; i++) {
+    cout << "  ";
+  }
+  cout << ptr->value << endl;
+
+  displayVisual(ptr->right, level + 1);
+  displayVisual(ptr->left, level + 1);
+    //if (ptr != NULL) {
+    //  displayVisual(ptr->right, level+1);
+     // cout << "\n";
+      //if (ptr == root)
+       // cout << "Root->:  ";
+     // else {
+     //   for (int i = 0;i < level;i++)
+     //     cout << "       ";
+     // }
+     // cout << ptr->value;
+     // displayVisual(ptr->left, level+1);
+  // }
 }
 

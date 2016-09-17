@@ -1,12 +1,14 @@
-objects = project6.o BinaryTree.o
+objects = project0.o BinaryTree.o Worker.o
 
-a.out: $(objects)
-	g++ -g -o a.out $(objects)
-project6.o: project6.cpp BinaryTree.h
-	g++ -g -c project6.cpp
+project0: $(objects)
+	g++ -g -o project0 $(objects)
+project0.o: project0.cpp BinaryTree.h Worker.h
+	g++ -g -c project0.cpp
 BinaryTree.o: BinaryTree.cpp BinaryTree.h
 	g++ -g -c BinaryTree.cpp
+Worker.o: Worker.cpp BinaryTree.h Worker.h
+	g++ -g -c Worker.cpp
 
 .PHONY: clean
 clean:
-	-rm a.out $(objects)
+	-rm project0 $(objects)

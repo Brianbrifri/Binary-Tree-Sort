@@ -22,8 +22,10 @@ class BinaryTree {
 		void destroySubTree(TreeNode *);
 		void deleteNode(string, TreeNode *&);
 		void makeDeletion(TreeNode *&);
-		void displayInOrder(TreeNode *) const;
-    void displayVisual(TreeNode *ptr, int level) const;
+		void displayInOrder(TreeNode *, ofstream&);
+    void displayPostOrder(TreeNode *, ofstream&);
+    void displayPreOrder(TreeNode *, ofstream&);
+    void displayVisual(TreeNode *ptr, int level);
 
 	public:
 		//Constructor
@@ -40,13 +42,12 @@ class BinaryTree {
 		void insertNode(int);
 		bool searchNode(int);
 		void remove(string);
-    void displayVisual() const {
+    void displayVisual() {
       displayVisual(root, 1);
     }
 
-		void displayInOrder() const {
-			displayInOrder(root);
-		}
+		void display(string fileName);
+		
 
 };
 #endif

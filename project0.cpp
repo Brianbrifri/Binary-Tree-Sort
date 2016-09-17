@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
 
   tree = processData(argv, argc); 	
 		
-	//tree->display();
+  display();
 
 	return 0;
 }
