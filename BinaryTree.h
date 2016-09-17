@@ -22,9 +22,9 @@ class BinaryTree {
 		void destroySubTree(TreeNode *);
 		void deleteNode(string, TreeNode *&);
 		void makeDeletion(TreeNode *&);
-		void displayInOrder(TreeNode *, ofstream&);
-    void displayPostOrder(TreeNode *, ofstream&);
-    void displayPreOrder(TreeNode *, ofstream&);
+		void displayInOrder(TreeNode *, int, ofstream&);
+    void displayPostOrder(TreeNode *, int, ofstream&);
+    void displayPreOrder(TreeNode *, int, ofstream&);
     void displayVisual(TreeNode *ptr, int level);
 
 	public:
