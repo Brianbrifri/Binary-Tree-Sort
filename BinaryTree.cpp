@@ -72,15 +72,13 @@ void BinaryTree::display(string fileName) {
   string orderFileName = fileName;
   orderFileName.append(".inorder");
 
-  cout << "filenames: " << preFileName << ", " << postFileName << ", " << orderFileName << endl;
-
   ofstream preFile, postFile, orderFile;
 
   preFile.open(preFileName.c_str());
   postFile.open(postFileName.c_str());
   orderFile.open(orderFileName.c_str());
 
-  cout << "PreOrder traversal: \n";
+  cout << "\nPreOrder traversal: \n";
   BinaryTree::displayPreOrder(root, preFile);
   cout << "\n";
   cout << "InOrder traversal: \n";
@@ -130,27 +128,17 @@ void BinaryTree::displayInOrder(TreeNode *nodePtr, ofstream &file) {
 
 void BinaryTree::displayVisual(TreeNode *ptr, int level) {
 
-  if(ptr == NULL) {
-    return;
+  if (ptr != NULL) {
+    displayVisual(ptr->right, level+1);
+    cout << "\n";
+    if (ptr == root)
+      cout << "Root->:  ";
+    else {
+      for (int i = 0;i < level;i++)
+        cout << "       ";
+    }
+    cout << ptr->value;
+    displayVisual(ptr->left, level+1);
   }
-  for(int i = 0; i < level; i++) {
-    cout << "  ";
-  }
-  cout << ptr->value << endl;
-
-  displayVisual(ptr->right, level + 1);
-  displayVisual(ptr->left, level + 1);
-    //if (ptr != NULL) {
-    //  displayVisual(ptr->right, level+1);
-     // cout << "\n";
-      //if (ptr == root)
-       // cout << "Root->:  ";
-     // else {
-     //   for (int i = 0;i < level;i++)
-     //     cout << "       ";
-     // }
-     // cout << ptr->value;
-     // displayVisual(ptr->left, level+1);
-  // }
 }
 

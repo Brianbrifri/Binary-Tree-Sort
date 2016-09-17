@@ -9,11 +9,10 @@ using namespace std;
 int main(int argc, char *argv[]) {
 
 	//Create an instance of the binary tree
-	BinaryTree *tree;
 
-  tree = processData(argv, argc); 	
+  processData(argv, argc); 	
 		
-  display();
+  displayData();
 
 	return 0;
 }

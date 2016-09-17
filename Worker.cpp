@@ -11,14 +11,11 @@ BinaryTree *processData(char ** argv, int argc) {
 
 	if(argc > 1) {
     preName = argv[1];
-    cout << "prename: " << preName << endl;
     size_t found = preName.find(data);
     if(found > preName.size()) {
-      cout << "found size: " << found << endl;
       fileName = preName + data;
     }
     else {
-      cout << "found size: " << found << endl;
       fileName = preName;
       preName = fileName.substr(0, found);
     }
@@ -36,13 +33,12 @@ BinaryTree *processData(char ** argv, int argc) {
 
   else {
     fileName = preName;
-      while(getline(cin, line)) {
+    while(getline(cin, line)) {
       numberString.append(line);
     }
   }
 
   //BinaryTree *ptr = addToTree(numberString);
-  cout << "fileName: " << fileName << endl;
   return addToTree(numberString);
 
 }
@@ -70,6 +66,6 @@ BinaryTree *addToTree(string numberString) {
   return tree;
 }
 
-void display() {
+void displayData() {
   tree->display(preName);
 }

@@ -6,5 +6,5 @@
 #include"BinaryTree.h"
 BinaryTree *processData(char**, int);
 BinaryTree *addToTree(string);
-void display();
+void displayData();
 #endif
