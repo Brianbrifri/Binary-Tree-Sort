@@ -65,6 +65,9 @@ bool BinaryTree::searchNode(int str) {
 }
 
 void BinaryTree::display(string fileName) {
+  //take in the filename to create the output files
+  //append .preorder, .postorder, and .inorder to the filename
+  //to make 3 different files
   string preFileName = fileName;
   preFileName.append(".preorder");
   string postFileName = fileName;
@@ -72,12 +75,14 @@ void BinaryTree::display(string fileName) {
   string orderFileName = fileName;
   orderFileName.append(".inorder");
 
+  //open  3 file streams for the 3 files
   ofstream preFile, postFile, orderFile;
 
   preFile.open(preFileName.c_str());
   postFile.open(postFileName.c_str());
   orderFile.open(orderFileName.c_str());
 
+  //call the display functions and pass in the ofstream
   cout << "\nPreOrder traversal: \n";
   BinaryTree::displayPreOrder(root, 0, preFile);
   cout << "\n";
@@ -91,6 +96,7 @@ void BinaryTree::display(string fileName) {
   BinaryTree::displayVisual(root, 1);
   cout << "\n";
 
+  //close the files
   preFile.close();
   postFile.close();
   orderFile.close();
