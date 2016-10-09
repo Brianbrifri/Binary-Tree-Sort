@@ -3,12 +3,14 @@
 using namespace std;
 
 string fileName, line, inputString;
-fstream file;
+char myChar;
+ifstream file;
 string extension = ".fs16";
 string preName = "out";
 
-int processData(char ** argv, int argc) {
-   
+int processData(char *argv[], int argc) {
+
+   inputString = "";
 
 	if(argc > 1) {
         preName = argv[1];
@@ -22,30 +24,34 @@ int processData(char ** argv, int argc) {
           preName = fileName.substr(0, found);
         }
 
-        file.open(fileName.c_str());
+        file.open(fileName.c_str(), ios::in);
 
         if(!file) {
             perror("Error opening file");
             exit(1);
         }
-        while(getline (file, line)) {
-            cout << line << endl;
-            inputString.append(line);
+
+        while(!file.eof()) {
+            file.get(myChar);
+            inputString += myChar;
         }
         file.close();
     }
 
     else {
-        fileName = preName;
 
-        while(getline(cin, line)) {
-            inputString.append(line);
+        while(!cin.eof()) {
+            cin.get(myChar);
+            inputString += myChar;
         }
     }
 
-    cout << inputString << endl;
-    return 0;
+    return scan(inputString);
 
 }
 
+int scan(string inputString) {
 
+    cout << inputString << endl;
+    return 0;
+}

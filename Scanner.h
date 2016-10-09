@@ -3,5 +3,9 @@
 #include<iostream>
 #include<fstream>
 #include<cstdlib>
-int processData(char**, int);
+#include<string>
+
+int processData(char*[], int);
+int scan(std::string);
+
 #endif
