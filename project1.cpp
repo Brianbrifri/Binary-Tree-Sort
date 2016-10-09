@@ -10,10 +10,10 @@ int main(int argc, char *argv[]) {
 
 	//Create an instance of the binary tree
 
-  processData(argv, argc); 	
+    processData(argv, argc);
 		
-  displayData();
+    displayData();
 
-	return 0;
+    return 0;
 }
 

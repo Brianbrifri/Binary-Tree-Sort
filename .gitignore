@@ -1,7 +1,5 @@
 *.o
 *.swp
-*.inorder
-*.preorder
-*.postorder
 a.out
-project0
+project1
+.idea/**/*
