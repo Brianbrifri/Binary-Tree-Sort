@@ -1,9 +1,10 @@
 #include "Scanner.h"
-
+#include "Token.h"
 using namespace std;
-string fileName, line, numberString;
+
+string fileName, line, inputString;
 fstream file;
-string data = ".fs16";
+string extension = ".fs16";
 string preName = "out";
 
 int processData(char ** argv, int argc) {
@@ -11,10 +12,10 @@ int processData(char ** argv, int argc) {
 
 	if(argc > 1) {
         preName = argv[1];
-        size_t found = preName.find(data);
+        size_t found = preName.find(extension);
 
         if(found > preName.size()) {
-          fileName = preName + data;
+          fileName = preName + extension;
         }
         else {
           fileName = preName;
@@ -28,7 +29,7 @@ int processData(char ** argv, int argc) {
             exit(1);
         }
         while(getline (file, line)) {
-            numberString.append(line);
+            inputString.append(line);
         }
         file.close();
     }
@@ -37,7 +38,7 @@ int processData(char ** argv, int argc) {
         fileName = preName;
 
         while(getline(cin, line)) {
-            numberString.append(line);
+            inputString.append(line);
         }
     }
 

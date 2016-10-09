@@ -1,5 +1,5 @@
 *.o
 *.swp
 a.out
-project1
+testScanner
 .idea/**/*

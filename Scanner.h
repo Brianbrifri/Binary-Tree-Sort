@@ -3,6 +3,5 @@
 #include<iostream>
 #include<fstream>
 #include<cstdlib>
-#include"Token.h"
 int processData(char**, int);
 #endif
