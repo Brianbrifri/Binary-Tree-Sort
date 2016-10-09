@@ -29,6 +29,7 @@ int processData(char ** argv, int argc) {
             exit(1);
         }
         while(getline (file, line)) {
+            cout << line << endl;
             inputString.append(line);
         }
         file.close();
@@ -42,7 +43,8 @@ int processData(char ** argv, int argc) {
         }
     }
 
-  return 0;
+    cout << inputString << endl;
+    return 0;
 
 }
 
