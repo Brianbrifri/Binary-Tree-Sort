@@ -1,8 +1,8 @@
 #include<iostream>
 #include<cstdlib>
 #include<fstream>
-#include "BinaryTree.h"
-#include "Worker.h"
+#include "Scanner.h"
+#include "Token.h"
 
 using namespace std;
 
@@ -12,8 +12,6 @@ int main(int argc, char *argv[]) {
 
     processData(argv, argc);
 		
-    displayData();
-
     return 0;
 }
 
