@@ -7,5 +7,6 @@
 
 int processData(char*[], int);
 int scan(std::string);
+int checkIfValidCharacter(char);
 
 #endif
