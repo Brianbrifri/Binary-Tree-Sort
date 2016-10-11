@@ -7,6 +7,8 @@ char myChar;
 fstream file;
 string extension = ".fs16";
 string preName = "out";
+int currentLineNumber = 1;
+int currentColumnNumber = 1;
 
 int processData(char *argv[], int argc) {
 
@@ -34,10 +36,13 @@ int processData(char *argv[], int argc) {
         //While have not reached the end of the file
         //get each character and append it to the input string
         while(!file.eof()) {
+
+            bool reachedEofInComment = false;
             file.get(myChar);
 
             //Exit immediately if a bad character is found
             if(checkIfValidCharacter(myChar) == BAD_CHARACTER) {
+                cout << "at location " << currentLineNumber << ":" << currentColumnNumber << endl;
                 return BAD_CHARACTER;
             }
 
@@ -49,14 +54,18 @@ int processData(char *argv[], int argc) {
 
                     //if comment goes until last line, break
                     if(file.eof()) {
+                        reachedEofInComment = true;
                         break;
                     }
                 } while((int) myChar != ASCII_WHITESPACE);
             }
 
             //Add all valid characters to the string
-            if(!file.eof()) {
+            //Do not accept the last character in the comment string
+            //if comment goes until eof
+            if(!reachedEofInComment) {
                 inputString += myChar;
+                currentColumnNumber++;
             }
         }
         file.close();
@@ -67,10 +76,13 @@ int processData(char *argv[], int argc) {
     else {
 
         while(!cin.eof()) {
+            bool reachedEofInComment = false;
+
             cin.get(myChar);
 
             //Exit immediately if a bad character is found
-            if(checkIfValidCharacter(myChar) == BAD_CHARACTER) {
+            if((checkIfValidCharacter(myChar)) == BAD_CHARACTER) {
+                cout << "at location " << currentLineNumber << ":" << currentColumnNumber << endl;
                 return BAD_CHARACTER;
             }
 
@@ -82,13 +94,16 @@ int processData(char *argv[], int argc) {
 
                     //if comment goes until last line, break
                     if(cin.eof()) {
+                        reachedEofInComment = true;
                         break;
                     }
                 } while((int) myChar != ASCII_WHITESPACE);
             }
 
             //Add all valid characters to the string
-            if(!cin.eof()) {
+            //Do not accept the last character in the comment string
+            //if comment goes until eof
+            if(!reachedEofInComment) {
                 inputString += myChar;
             }
         }
@@ -109,11 +124,15 @@ int scan(string inputString) {
 int checkIfValidCharacter(char myChar) {
     int asciiChar = (int) myChar;
 //    cout << myChar << ": " << asciiChar << " ";
+    if(asciiChar == 10) {
+        currentLineNumber++;
+        currentColumnNumber = 0;
+    }
 
     if(asciiChar < 10 || (10 < asciiChar && asciiChar < 32) || (33 < asciiChar && asciiChar < 37) ||
        asciiChar == 39 || asciiChar == 63 || asciiChar == 92 || (93 < asciiChar && asciiChar < 97) ||
        asciiChar == 124 || 125 < asciiChar) {
-            cout << "Found bad character " << myChar << endl;
+            cout << "Found bad character " << myChar << " ";
             return BAD_CHARACTER;
        }
     else {
