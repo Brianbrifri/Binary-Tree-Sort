@@ -110,7 +110,7 @@ int checkIfValidCharacter(char myChar) {
     int asciiChar = (int) myChar;
 //    cout << myChar << ": " << asciiChar << " ";
 
-    if(asciiChar < 10 || (10 < asciiChar && asciiChar < 32) || (33 < asciiChar && asciiChar < 36) ||
+    if(asciiChar < 10 || (10 < asciiChar && asciiChar < 32) || (33 < asciiChar && asciiChar < 37) ||
        asciiChar == 39 || asciiChar == 63 || asciiChar == 92 || (93 < asciiChar && asciiChar < 97) ||
        asciiChar == 124 || 125 < asciiChar) {
             cout << "Found bad character " << myChar << endl;
