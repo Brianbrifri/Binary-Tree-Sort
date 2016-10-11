@@ -51,6 +51,7 @@ int processData(char *argv[], int argc) {
             if((int) myChar == ASCII_BEGIN_COMMENT) {
                 do {
                     file.get(myChar);
+                    currentColumnNumber++;
 
                     //if comment goes until last line, break
                     if(file.eof()) {
@@ -91,6 +92,7 @@ int processData(char *argv[], int argc) {
             if((int) myChar == ASCII_BEGIN_COMMENT) {
                 do {
                     cin.get(myChar);
+                    currentColumnNumber++;
 
                     //if comment goes until last line, break
                     if(cin.eof()) {
@@ -105,6 +107,7 @@ int processData(char *argv[], int argc) {
             //if comment goes until eof
             if(!reachedEofInComment) {
                 inputString += myChar;
+                currentColumnNumber++;
             }
         }
     }
@@ -124,6 +127,7 @@ int scan(string inputString) {
 int checkIfValidCharacter(char myChar) {
     int asciiChar = (int) myChar;
 //    cout << myChar << ": " << asciiChar << " ";
+
     if(asciiChar == 10) {
         currentLineNumber++;
         currentColumnNumber = 0;
@@ -134,7 +138,7 @@ int checkIfValidCharacter(char myChar) {
        asciiChar == 124 || 125 < asciiChar) {
             cout << "Found bad character " << myChar << " ";
             return BAD_CHARACTER;
-       }
+    }
     else {
         return GOOD_CHARACTER;
     }
