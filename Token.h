@@ -7,9 +7,21 @@
 static const int BAD_CHARACTER = -5;
 static const int GOOD_CHARACTER = 5;
 
-//Common usage constants
-static const int ASCII_WHITESPACE = 32;
-static const int ASCII_BEGIN_COMMENT = 64;
+//Common usage ASCII constants
+static const int WHITESPACE = 32;
+static const int START_DIGIT = 48;
+static const int END_DIGIT = 57;
+static const int START_UPPER_LETTER = 65;
+static const int END_UPPER_LETTER = 90;
+static const int START_LOWER_LETTER = 97;
+static const int END_LOWER_LETTER = 122;
+static const int COMMENT_TAG = 64;
+
+//FSA Table States
+static const int STARTING_STATE = 1;
+static const int WHITESPACE_STATE = 2;
+static const int DIGIT_STATE = 3;
+static const int LETTER_STATE = 4;
 
 //Token array sizes and data
 static const int KeywordsSize = 14;

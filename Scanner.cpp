@@ -48,7 +48,7 @@ int processData(char *argv[], int argc) {
 
             //If the '@' symbol is found for comments, continue on till
             //white space so as not to include the comments in the processing
-            if((int) myChar == ASCII_BEGIN_COMMENT) {
+            if((int) myChar == COMMENT_TAG) {
                 do {
                     file.get(myChar);
                     currentColumnNumber++;
@@ -58,7 +58,7 @@ int processData(char *argv[], int argc) {
                         reachedEofInComment = true;
                         break;
                     }
-                } while((int) myChar != ASCII_WHITESPACE);
+                } while((int) myChar != WHITESPACE);
             }
 
             //Add all valid characters to the string
@@ -89,7 +89,7 @@ int processData(char *argv[], int argc) {
 
             //If the '@' symbol is found for comments, continue on till
             //white space so as not to include the comments in the processing
-            if((int) myChar == ASCII_BEGIN_COMMENT) {
+            if((int) myChar == COMMENT_TAG) {
                 do {
                     cin.get(myChar);
                     currentColumnNumber++;
@@ -99,7 +99,7 @@ int processData(char *argv[], int argc) {
                         reachedEofInComment = true;
                         break;
                     }
-                } while((int) myChar != ASCII_WHITESPACE);
+                } while((int) myChar != WHITESPACE);
             }
 
             //Add all valid characters to the string
@@ -144,4 +144,16 @@ int checkIfValidCharacter(char myChar) {
     }
 }
 
+int isNewLine(int asciiChar) {
+    return asciiChar == WHITESPACE ? WHITESPACE_STATE : 0;
+}
+
+int isDigit(int asciiChar) {
+    return (START_DIGIT <= asciiChar && asciiChar <= END_DIGIT) ? DIGIT_STATE : 0;
+}
+
+int isLetter(int asciiChar) {
+    return (START_UPPER_LETTER <= asciiChar && asciiChar <= END_UPPER_LETTER) ||
+           (START_LOWER_LETTER <= asciiChar && asciiChar <= END_LOWER_LETTER) ? LETTER_STATE : 0;
+}
 
