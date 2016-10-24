@@ -8,22 +8,62 @@ static const int BAD_CHARACTER = -5;
 static const int GOOD_CHARACTER = 5;
 static int FSA_ERROR = -2;
 
-//Common usage ASCII constants
-static const int WHITESPACE = 32;
+//ASCII constants
+static const int NEWLINE_CHARACTER = 10;
+static const int EXCLPOINT = 33;
+static const int WHITESPACE_CHARACTER = 32;
+static const int PERCENT = 37;
+static const int AMP = 38;
+static const int LPARENS = 40;
+static const int RPARENS = 41;
+static const int STAR = 42;
+static const int PLUS = 43;
+static const int COMMA = 44;
+static const int MINUS = 45;
+static const int PERIOD = 46;
+static const int SLASH = 47;
 static const int START_DIGIT = 48;
 static const int END_DIGIT = 57;
+static const int COLON = 58;
+static const int SEMICOLON = 59;
+static const int LESS = 60;
+static const int EQ = 61;
+static const int GREATER = 62;
 static const int START_UPPER_LETTER = 65;
 static const int END_UPPER_LETTER = 90;
+static const int LBRACE = 91;
+static const int RBRACE = 93;
 static const int START_LOWER_LETTER = 97;
 static const int END_LOWER_LETTER = 122;
+static const int LBRACKET = 123;
+static const int RBRACKET = 125;
 static const int COMMENT_TAG = 64;
 
 //FSA Table Columns
-static const int STARTING_STATE = 0;
-static const int NEWLINE_STATE = 1;
-static const int WHITESPACE_STATE = 2;
-static const int DIGIT_STATE = 3;
-static const int LETTER_STATE = 4;
+static const int NEWLINE_WHITESPACE_COL = 0;
+static const int LETTER_COL = 1;
+static const int DIGIT_COL = 2;
+static const int EQUALS_COL = 3;
+static const int EXCLPOINT_COL = 4;
+static const int GREATER_COL = 5;
+static const int LESS_COL = 6;
+static const int COLON_COL = 7; 
+static const int PLUS_COL = 8;
+static const int MINUS_COL = 9;
+static const int STAR_COL = 10;
+static const int SLASH_COL = 11;
+static const int AMP_COL = 12;
+static const int PERCENT_COL = 13;
+static const int PERIOD_COL = 14;
+static const int LPARENS_COL = 15;
+static const int RPARENS_COL = 16;
+static const int COMMA_COL = 17;
+static const int LBRACE_COL = 18;
+static const int RBRACE_COL = 19;
+static const int SEMICOLON_COL = 20;
+static const int LBRACKET_COL = 21;
+static const int RBRACKET_COL = 22;
+
 
 //Token array sizes and data
 static const int KeywordsSize = 14;
