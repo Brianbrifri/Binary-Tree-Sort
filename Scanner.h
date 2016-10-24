@@ -8,6 +8,7 @@
 int processData(char*[], int);
 int scan(std::string);
 int checkIfValidCharacter(char);
+int getState(char);
 int isNewLine(int);
 int isDigit(int);
 int isLetter(int);

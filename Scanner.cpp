@@ -144,6 +144,15 @@ int checkIfValidCharacter(char myChar) {
     }
 }
 
+int getState(char myChar) {
+    int asciiChar = (int) myChar;
+
+    if(isNewLine(asciiChar)) return NEWLINE_STATE;
+    else if(isDigit(asciiChar)) return DIGIT_STATE;
+    else if(isLetter(asciiChar)) return LETTER_STATE;
+    else return BAD_CHARACTER;
+}
+
 int isNewLine(int asciiChar) {
     return asciiChar == WHITESPACE ? WHITESPACE_STATE : 0;
 }
@@ -156,4 +165,5 @@ int isLetter(int asciiChar) {
     return (START_UPPER_LETTER <= asciiChar && asciiChar <= END_UPPER_LETTER) ||
            (START_LOWER_LETTER <= asciiChar && asciiChar <= END_LOWER_LETTER) ? LETTER_STATE : 0;
 }
+
 
