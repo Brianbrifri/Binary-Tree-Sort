@@ -4,12 +4,16 @@
 #include<fstream>
 #include<cstdlib>
 #include<string>
+#include "Token.h"
 
 int processData(char*[], int);
 int scan(std::string);
 int checkIfValidCharacter(char);
-int isKeyWord(std::string);
+std::string getTokenName(int);
+int matchIdToKeyword(std::string);
+void printToken(token);
 int getCharacterColumn(char);
+bool stateIsIdent(int);
 int isNewLine(int);
 int isWhiteSpace(int);
 int isDigit(int);
@@ -34,5 +38,6 @@ int isRBrace(int);
 int isSemiColon(int);
 int isLBracket(int);
 int isRBracket(int);
+int isCommentTag(int);
 
 #endif

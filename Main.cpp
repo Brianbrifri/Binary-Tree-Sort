@@ -6,11 +6,13 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
 
-    cout << "In main and got file " << argv[1] << endl;
     switch(processData(argv, argc)) {
         case BAD_CHARACTER:
             cout << "Exiting due to bad character\n";
             exit(BAD_CHARACTER);
+        case FSA_ERROR:
+            cout << "Exiting due to language error\n";
+            exit(FSA_ERROR);
         case 0:
             cout << "Program exiting normally\n";
             break;

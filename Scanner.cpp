@@ -1,5 +1,4 @@
 #include "Scanner.h"
-#include "Token.h"
 using namespace std;
 
 string fileName, line, inputString;
@@ -36,15 +35,16 @@ int processData(char *argv[], int argc) {
         //While have not reached the end of the file
         //get each character and append it to the input string
         while(!file.eof()) {
+            
 
             bool reachedEofInComment = false;
             file.get(myChar);
 
             //Exit immediately if a bad character is found
-            //if(checkIfValidCharacter(myChar) == BAD_CHARACTER) {
-            //    cout << "at location " << currentLineNumber << ":" << currentColumnNumber << endl;
-            //    return BAD_CHARACTER;
-            //}
+            if(getCharacterColumn(myChar) == BAD_CHARACTER) {
+                cout << "at location " << currentLineNumber << ":" << currentColumnNumber << endl;
+                return BAD_CHARACTER;
+            }
 
             //If the '@' symbol is found for comments, continue on till
             //white space so as not to include the comments in the processing
@@ -61,6 +61,7 @@ int processData(char *argv[], int argc) {
                 } while((int) myChar != WHITESPACE_CHARACTER);
             }
 
+            //cout << myChar;
             //Add all valid characters to the string
             //Do not accept the last character in the comment string
             //if comment goes until eof
@@ -82,7 +83,7 @@ int processData(char *argv[], int argc) {
             cin.get(myChar);
 
             //Exit immediately if a bad character is found
-            if((checkIfValidCharacter(myChar)) == BAD_CHARACTER) {
+            if((getCharacterColumn(myChar)) == BAD_CHARACTER) {
                 cout << "at location " << currentLineNumber << ":" << currentColumnNumber << endl;
                 return BAD_CHARACTER;
             }
@@ -119,39 +120,42 @@ int processData(char *argv[], int argc) {
 
 int scan(string inputString) {
     int state = BEGIN_STATE;
+    int nextState;
+    bool lastStateNotFinal = true;
+    currentLineNumber = 1;
+    string currentTokenString = "";
     
     for(int i = 0; i < inputString.size(); i++) {
-       do{
-          state = stateTable[state][getCharacterColumn(inputString[i])];
-       }while(state < 1000);
-       cout << state << endl;
-
+       state = stateTable[state][getCharacterColumn(inputString[i])]; 
+        if(state >= 1000) {
+            if(stateIsIdent(state)) {
+                cout << "Ident token to match " << currentTokenString << endl;
+                state = matchIdToKeyword(currentTokenString);
+            }
+            struct token myToken;
+            myToken.tokenId = state;
+            myToken.tokenName = getTokenName(state);
+            myToken.lineNumber = currentLineNumber;
+            state = BEGIN_STATE;
+            cout << currentTokenString << endl;
+            printToken(myToken);
+            currentTokenString = "";
+            i--;
+            lastStateNotFinal = false;
+            cout << endl << endl;
+        }
+        if(state == FSA_ERROR) {
+            return FSA_ERROR;
+        }
+        if(inputString.at(i) != ' ' && inputString.at(i) != '\n' && lastStateNotFinal) {
+            currentTokenString += inputString[i];
+        }
+ 
+        lastStateNotFinal = true;
     }
     cout << inputString << endl;
 
     return 0;
-}
-
-//Convert the character to ascii and check if it is in the accepted range of
-//characters. If not, return the BAD_CHARACTER constant.
-int checkIfValidCharacter(char myChar) {
-    int asciiChar = (int) myChar;
-//    cout << myChar << ": " << asciiChar << " ";
-
-    if(asciiChar == NEWLINE_CHARACTER) {
-        currentLineNumber++;
-        currentColumnNumber = 0;
-    }
-
-    if(asciiChar < 10 || (10 < asciiChar && asciiChar < 32) || (33 < asciiChar && asciiChar < 37) ||
-       asciiChar == 39 || asciiChar == 63 || asciiChar == 92 || (93 < asciiChar && asciiChar < 97) ||
-       asciiChar == 124 || 125 < asciiChar) {
-            cout << "Found bad character " << myChar << " ";
-            return BAD_CHARACTER;
-    }
-    else {
-        return GOOD_CHARACTER;
-    }
 }
 
 int getCharacterColumn(char myChar) {
@@ -159,6 +163,7 @@ int getCharacterColumn(char myChar) {
 
     if(isNewLine(asciiChar)) {
       currentLineNumber++;
+      currentColumnNumber = 0;
       return NEWLINE_WHITESPACE_COL;
     }
     else if(isWhiteSpace(asciiChar)) return NEWLINE_WHITESPACE_COL;
@@ -184,16 +189,35 @@ int getCharacterColumn(char myChar) {
     else if(isSemiColon(asciiChar)) return SEMICOLON_COL;
     else if(isLBracket(asciiChar)) return LBRACKET_COL;
     else if(isRBracket(asciiChar)) return RBRACKET_COL;
+    else if(isCommentTag(asciiChar)) return COMMENT_TAG;
     else return BAD_CHARACTER;
 }
 
-int isKeyWord(string currentIdentifier) {
+string getTokenName(int token) {
+   for(int i = 0; i < TokenArraySize; i++) {
+      if(token == tokenID[i]) {
+          return tokenName[i];
+      }
+   } 
+}
+
+int matchIdToKeyword(string currentIdentifier) {
   for(int i = 0; i < KeywordsSize; i++) {
     if((currentIdentifier.compare(Keywords[i])) == 0) {
-      return i;
+      return tokenID[i];
     }
   }
-  return -1;
+  return 1037;
+}
+
+bool stateIsIdent(int token) {
+    return token == 1037 ? true : false;
+}
+
+void printToken(token myToken) {
+    cout << "Token ID: " << myToken.tokenId << endl;
+    cout << "Token Name: " << myToken.tokenName << endl;
+    cout << "Line Number: " << myToken.lineNumber << endl;
 }
 
 int isNewLine(int asciiChar) {
@@ -290,4 +314,8 @@ int isLBracket(int asciiChar) {
 
 int isRBracket(int asciiChar) {
   return asciiChar == RBRACKET ? RBRACKET : 0;
+}
+
+int isCommentTag(int asciiChar) {
+  return asciiChar == COMMENT_TAG ? COMMENT_TAG : 0;
 }

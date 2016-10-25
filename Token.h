@@ -6,8 +6,8 @@
 //Misc constants
 static const int BAD_CHARACTER = -5;
 static const int GOOD_CHARACTER = 5;
-static int FSA_ERROR = -2;
-static int BEGIN_STATE = 0;
+static const int FSA_ERROR = -2;
+static const int BEGIN_STATE = 0;
 
 //ASCII constants
 static const int NEWLINE_CHARACTER = 10;
@@ -30,6 +30,7 @@ static const int SEMICOLON = 59;
 static const int LESS = 60;
 static const int EQ = 61;
 static const int GREATER = 62;
+static const int COMMENT_TAG = 64;
 static const int START_UPPER_LETTER = 65;
 static const int END_UPPER_LETTER = 90;
 static const int LBRACE = 91;
@@ -38,7 +39,6 @@ static const int START_LOWER_LETTER = 97;
 static const int END_LOWER_LETTER = 122;
 static const int LBRACKET = 123;
 static const int RBRACKET = 125;
-static const int COMMENT_TAG = 64;
 
 //FSA Table Columns
 static const int NEWLINE_WHITESPACE_COL = 0;
@@ -111,11 +111,10 @@ static const int stateTable[26][23] = {
 };
 
 //Token struct
-static struct token {
-    int tokenID;
+struct token {
+    int tokenId;
     std::string tokenName;
-    std::string matchingString;
     int lineNumber;
-} token;
+};
 
 #endif
