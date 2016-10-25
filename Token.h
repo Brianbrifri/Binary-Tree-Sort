@@ -114,6 +114,7 @@ static const int stateTable[26][23] = {
 struct token {
     int tokenId;
     std::string tokenName;
+    std::string matchingString;
     int lineNumber;
 };
 

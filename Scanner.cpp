@@ -122,32 +122,38 @@ int scan(string inputString) {
     int state = BEGIN_STATE;
     int nextState;
     bool lastStateNotFinal = true;
+    bool notEOF = true;
     currentLineNumber = 1;
     string currentTokenString = "";
     
     for(int i = 0; i < inputString.size(); i++) {
+       if(i == inputString.size() - 1) {
+          notEOF = false;
+       }
        state = stateTable[state][getCharacterColumn(inputString[i])]; 
         if(state >= 1000) {
+            currentTokenString = cleanTokenString(currentTokenString);
             if(stateIsIdent(state)) {
-                cout << "Ident token to match " << currentTokenString << endl;
                 state = matchIdToKeyword(currentTokenString);
             }
             struct token myToken;
             myToken.tokenId = state;
             myToken.tokenName = getTokenName(state);
+            myToken.matchingString = currentTokenString;
             myToken.lineNumber = currentLineNumber;
             state = BEGIN_STATE;
-            cout << currentTokenString << endl;
             printToken(myToken);
             currentTokenString = "";
-            i--;
+            if(notEOF) {
+              i--; 
+            }
             lastStateNotFinal = false;
             cout << endl << endl;
         }
         if(state == FSA_ERROR) {
             return FSA_ERROR;
         }
-        if(inputString.at(i) != ' ' && inputString.at(i) != '\n' && lastStateNotFinal) {
+        if(lastStateNotFinal) {
             currentTokenString += inputString[i];
         }
  
@@ -214,9 +220,19 @@ bool stateIsIdent(int token) {
     return token == 1037 ? true : false;
 }
 
+string cleanTokenString(string ident) {
+    for(int i = 0; i < ident.size(); i++) {
+        if(ident.at(i) == ' ' || ident.at(i) == '\n') {
+            ident.erase(i, 1);
+        }
+    }
+    return ident;
+}
+
 void printToken(token myToken) {
     cout << "Token ID: " << myToken.tokenId << endl;
     cout << "Token Name: " << myToken.tokenName << endl;
+    cout << "Matching String: " << myToken.matchingString << endl;
     cout << "Line Number: " << myToken.lineNumber << endl;
 }
 

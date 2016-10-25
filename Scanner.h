@@ -13,6 +13,7 @@ std::string getTokenName(int);
 int matchIdToKeyword(std::string);
 void printToken(token);
 int getCharacterColumn(char);
+std::string cleanTokenString(std::string);
 bool stateIsIdent(int);
 int isNewLine(int);
 int isWhiteSpace(int);
