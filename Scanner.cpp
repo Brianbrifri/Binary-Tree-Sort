@@ -144,9 +144,7 @@ int scan(string inputString) {
             state = BEGIN_STATE;
             printToken(myToken);
             currentTokenString = "";
-            if(notEOF) {
-              i--; 
-            }
+            i--; 
             lastStateNotFinal = false;
             cout << endl << endl;
         }
@@ -159,6 +157,11 @@ int scan(string inputString) {
  
         lastStateNotFinal = true;
     }
+    struct token myToken;
+    myToken.tokenId = 1050;
+    myToken.tokenName = getTokenName(1050);
+    myToken.lineNumber = currentLineNumber;
+    printToken(myToken);
     cout << inputString << endl;
 
     return 0;
