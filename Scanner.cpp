@@ -122,14 +122,10 @@ int scan(string inputString) {
     int state = BEGIN_STATE;
     int nextState;
     bool lastStateNotFinal = true;
-    bool notEOF = true;
     currentLineNumber = 1;
     string currentTokenString = "";
     
     for(int i = 0; i < inputString.size(); i++) {
-       if(i == inputString.size() - 1) {
-          notEOF = false;
-       }
        state = stateTable[state][getCharacterColumn(inputString[i])]; 
         if(state >= 1000) {
             currentTokenString = cleanTokenString(currentTokenString);
