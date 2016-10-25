@@ -3,10 +3,11 @@
 #include <string>
 #include <cstdlib>
 
-//Error constants
+//Misc constants
 static const int BAD_CHARACTER = -5;
 static const int GOOD_CHARACTER = 5;
 static int FSA_ERROR = -2;
+static int BEGIN_STATE = 0;
 
 //ASCII constants
 static const int NEWLINE_CHARACTER = 10;

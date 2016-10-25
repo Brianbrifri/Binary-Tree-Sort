@@ -41,10 +41,10 @@ int processData(char *argv[], int argc) {
             file.get(myChar);
 
             //Exit immediately if a bad character is found
-            if(checkIfValidCharacter(myChar) == BAD_CHARACTER) {
-                cout << "at location " << currentLineNumber << ":" << currentColumnNumber << endl;
-                return BAD_CHARACTER;
-            }
+            //if(checkIfValidCharacter(myChar) == BAD_CHARACTER) {
+            //    cout << "at location " << currentLineNumber << ":" << currentColumnNumber << endl;
+            //    return BAD_CHARACTER;
+            //}
 
             //If the '@' symbol is found for comments, continue on till
             //white space so as not to include the comments in the processing
@@ -118,7 +118,17 @@ int processData(char *argv[], int argc) {
 }
 
 int scan(string inputString) {
+    int state = BEGIN_STATE;
+    
+    for(int i = 0; i < inputString.size(); i++) {
+       do{
+          state = stateTable[state][getCharacterColumn(inputString[i])];
+       }while(state < 1000);
+       cout << state << endl;
+
+    }
     cout << inputString << endl;
+
     return 0;
 }
 
@@ -147,7 +157,11 @@ int checkIfValidCharacter(char myChar) {
 int getCharacterColumn(char myChar) {
     int asciiChar = (int) myChar;
 
-    if(isNewLineOrWhitespace(asciiChar)) return NEWLINE_WHITESPACE_COL;
+    if(isNewLine(asciiChar)) {
+      currentLineNumber++;
+      return NEWLINE_WHITESPACE_COL;
+    }
+    else if(isWhiteSpace(asciiChar)) return NEWLINE_WHITESPACE_COL;
     else if(isDigit(asciiChar)) return DIGIT_COL;
     else if(isLetter(asciiChar)) return LETTER_COL;
     else if(isEqSign(asciiChar)) return EQUALS_COL;
@@ -182,8 +196,12 @@ int isKeyWord(string currentIdentifier) {
   return -1;
 }
 
-int isNewLineOrWhitespace(int asciiChar) {
-    return (asciiChar == WHITESPACE_CHARACTER || asciiChar == NEWLINE_CHARACTER) ? WHITESPACE_CHARACTER : 0;
+int isNewLine(int asciiChar) {
+    return asciiChar == NEWLINE_CHARACTER ? WHITESPACE_CHARACTER : 0;
+}
+
+int isWhiteSpace(int asciiChar) {
+    return asciiChar == WHITESPACE_CHARACTER ? WHITESPACE_CHARACTER : 0;
 }
 
 int isDigit(int asciiChar) {

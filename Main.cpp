@@ -6,6 +6,7 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
 
+    cout << "In main and got file " << argv[1] << endl;
     switch(processData(argv, argc)) {
         case BAD_CHARACTER:
             cout << "Exiting due to bad character\n";
