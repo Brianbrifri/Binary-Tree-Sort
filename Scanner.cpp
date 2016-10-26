@@ -40,9 +40,14 @@ int processData(char *argv[], int argc) {
             bool reachedEofInComment = false;
             file.get(myChar);
 
+            if(myChar == '\n') {
+                currentLineNumber++;
+                currentColumnNumber = 0;
+            }
+
             //Exit immediately if a bad character is found
             if(getCharacterColumn(myChar) == BAD_CHARACTER) {
-                cout << "at location " << currentLineNumber << ":" << currentColumnNumber << endl;
+                cout << "Found bad character at location " << currentLineNumber << ":" << currentColumnNumber << endl;
                 return BAD_CHARACTER;
             }
 
@@ -82,9 +87,14 @@ int processData(char *argv[], int argc) {
 
             cin.get(myChar);
 
+            if(myChar == '\n') {
+                currentLineNumber++;
+                currentColumnNumber = 0;
+            }
+
             //Exit immediately if a bad character is found
             if((getCharacterColumn(myChar)) == BAD_CHARACTER) {
-                cout << "at location " << currentLineNumber << ":" << currentColumnNumber << endl;
+                cout << "Found bad character at location " << currentLineNumber << ":" << currentColumnNumber << endl;
                 return BAD_CHARACTER;
             }
 
@@ -145,9 +155,12 @@ int scan(string inputString) {
             cout << endl << endl;
         }
         if(state == FSA_ERROR) {
-            return FSA_ERROR;
+           return FSA_ERROR;
         }
         if(lastStateNotFinal) {
+            if(inputString.at(i) == '\n') {
+                currentLineNumber++;
+            }
             currentTokenString += inputString[i];
         }
  
@@ -166,11 +179,7 @@ int scan(string inputString) {
 int getCharacterColumn(char myChar) {
     int asciiChar = (int) myChar;
 
-    if(isNewLine(asciiChar)) {
-      currentLineNumber++;
-      currentColumnNumber = 0;
-      return NEWLINE_WHITESPACE_COL;
-    }
+    if(isNewLine(asciiChar)) return NEWLINE_WHITESPACE_COL;
     else if(isWhiteSpace(asciiChar)) return NEWLINE_WHITESPACE_COL;
     else if(isDigit(asciiChar)) return DIGIT_COL;
     else if(isLetter(asciiChar)) return LETTER_COL;
