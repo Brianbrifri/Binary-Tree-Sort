@@ -6,6 +6,7 @@
 //Misc constants
 static const int BAD_CHARACTER = -5;
 static const int GOOD_CHARACTER = 5;
+static const int FILE_ERROR = -3;
 static const int FSA_ERROR = -2;
 static const int BEGIN_STATE = 0;
 

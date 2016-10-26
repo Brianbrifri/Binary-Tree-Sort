@@ -13,6 +13,9 @@ int main(int argc, char *argv[]) {
         case FSA_ERROR:
             cout << "Exiting due to language error\n";
             exit(FSA_ERROR);
+        case FILE_ERROR:
+            cout << "Exiting due to file open error\n";
+            exit(FILE_ERROR);
         case 0:
             cout << "Program exiting normally\n";
             break;

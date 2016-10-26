@@ -29,7 +29,7 @@ int processData(char *argv[], int argc) {
 
         if(!file) {
             perror("Error opening file");
-            exit(1);
+            return FILE_ERROR;
         }
 
         //While have not reached the end of the file
