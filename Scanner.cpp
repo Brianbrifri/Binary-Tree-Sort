@@ -8,6 +8,7 @@ string extension = ".fs16";
 string preName = "out";
 int currentLineNumber = 1;
 int currentColumnNumber = 1;
+int locationInString = 0;
 
 int processData(char *argv[], int argc) {
 
@@ -129,51 +130,56 @@ int processData(char *argv[], int argc) {
 }
 
 int scan(string inputString) {
-    int state = BEGIN_STATE;
-    int nextState;
-    bool lastStateNotFinal = true;
-    currentLineNumber = 1;
-    string currentTokenString = "";
-    
-    for(int i = 0; i < inputString.size(); i++) {
-       state = stateTable[state][getCharacterColumn(inputString[i])]; 
-        if(state >= 1000) {
-            currentTokenString = cleanTokenString(currentTokenString);
-            if(stateIsIdent(state)) {
-                state = matchIdToKeyword(currentTokenString);
-            }
-            struct token myToken;
-            myToken.tokenId = state;
-            myToken.tokenName = getTokenName(state);
-            myToken.matchingString = currentTokenString;
-            myToken.lineNumber = currentLineNumber;
-            state = BEGIN_STATE;
-            printToken(myToken);
-            currentTokenString = "";
-            i--; 
-            lastStateNotFinal = false;
-            cout << endl << endl;
-        }
-        if(state == FSA_ERROR) {
-           return FSA_ERROR;
-        }
-        if(lastStateNotFinal) {
-            if(inputString.at(i) == '\n') {
-                currentLineNumber++;
-            }
-            currentTokenString += inputString[i];
-        }
- 
-        lastStateNotFinal = true;
-    }
-    struct token myToken;
-    myToken.tokenId = 1050;
-    myToken.tokenName = getTokenName(1050);
-    myToken.lineNumber = currentLineNumber;
-    printToken(myToken);
-    cout << inputString << endl;
+  struct token *myToken;
 
-    return 0;
+  myToken = scanner();
+  cout << myToken->tokenId << endl;
+  delete myToken;
+  myToken = NULL;
+  myToken = scanner();
+  cout << myToken->tokenId << endl;
+
+  return 0;
+}
+
+struct token * scanner() {
+  int state = BEGIN_STATE;
+  bool lastStateNotFinal = true;
+  string currentTokenString = "";
+  
+  while(locationInString < inputString.size()) {
+     state = stateTable[state][getCharacterColumn(inputString[locationInString])]; 
+      if(state >= 1000) {
+          currentTokenString = cleanTokenString(currentTokenString);
+          if(stateIsIdent(state)) {
+              state = matchIdToKeyword(currentTokenString);
+          }
+          struct token *myToken = new struct token;
+          myToken->tokenId = state;
+          myToken->tokenName = getTokenName(state);
+          myToken->matchingString = currentTokenString;
+          myToken->lineNumber = currentLineNumber;
+          state = BEGIN_STATE;
+          locationInString--; 
+          lastStateNotFinal = false;
+          return myToken;
+      }
+      if(state == FSA_ERROR) {
+         struct token *myToken = new struct token;
+         myToken->tokenId = FSA_ERROR;
+         return myToken;
+      }
+      if(lastStateNotFinal) {
+          if(inputString.at(locationInString) == '\n') {
+              currentLineNumber++;
+          }
+          currentTokenString += inputString[locationInString];
+      }
+
+      lastStateNotFinal = true;
+      locationInString++;
+  }
+
 }
 
 int getCharacterColumn(char myChar) {

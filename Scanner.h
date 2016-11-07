@@ -8,6 +8,7 @@
 
 int processData(char*[], int);
 int scan(std::string);
+struct token* scanner(void);
 int checkIfValidCharacter(char);
 std::string getTokenName(int);
 int matchIdToKeyword(std::string);
