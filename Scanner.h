@@ -6,13 +6,20 @@
 #include<string>
 #include "Token.h"
 
+//Main functions of Scanner
 int processData(char*[], int);
 int scan(std::string);
-struct token* scanner(void);
-int checkIfValidCharacter(char);
+
+//Token functions
+void scanner(struct token*);
 std::string getTokenName(int);
+void printToken(token*);
+
+//Node functions
+
+//Parsing functions
+int checkIfValidCharacter(char);
 int matchIdToKeyword(std::string);
-void printToken(token);
 int getCharacterColumn(char);
 std::string cleanTokenString(std::string);
 bool stateIsIdent(int);

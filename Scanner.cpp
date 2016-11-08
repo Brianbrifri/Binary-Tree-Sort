@@ -130,22 +130,33 @@ int processData(char *argv[], int argc) {
 }
 
 int scan(string inputString) {
-  struct token *myToken;
+  struct token *myToken = new struct token;
+  currentLineNumber = 1;
 
-  myToken = scanner();
-  cout << myToken->tokenId << endl;
-  delete myToken;
-  myToken = NULL;
-  myToken = scanner();
-  cout << myToken->tokenId << endl;
+  scanner(myToken);
+  printToken(myToken);
+  //delete myToken;
+  //myToken = NULL;
+  scanner(myToken);
+  printToken(myToken);
 
   return 0;
 }
 
-struct token * scanner() {
+void scanner(struct token* myToken) {
   int state = BEGIN_STATE;
   bool lastStateNotFinal = true;
   string currentTokenString = "";
+
+  if(locationInString >= inputString.size()) {
+      state = 1050;
+      myToken->tokenId = state;
+      myToken->tokenName = getTokenName(state);
+      myToken->matchingString = "";
+      myToken->lineNumber = currentLineNumber;
+      lastStateNotFinal = false;
+      return;
+  }
   
   while(locationInString < inputString.size()) {
      state = stateTable[state][getCharacterColumn(inputString[locationInString])]; 
@@ -154,31 +165,45 @@ struct token * scanner() {
           if(stateIsIdent(state)) {
               state = matchIdToKeyword(currentTokenString);
           }
-          struct token *myToken = new struct token;
+          //struct token *myToken = new struct token;
           myToken->tokenId = state;
           myToken->tokenName = getTokenName(state);
           myToken->matchingString = currentTokenString;
           myToken->lineNumber = currentLineNumber;
-          state = BEGIN_STATE;
-          locationInString--; 
           lastStateNotFinal = false;
-          return myToken;
+          return;
       }
       if(state == FSA_ERROR) {
-         struct token *myToken = new struct token;
+         //struct token *myToken = new struct token;
          myToken->tokenId = FSA_ERROR;
-         return myToken;
+         return;
       }
-      if(lastStateNotFinal) {
-          if(inputString.at(locationInString) == '\n') {
-              currentLineNumber++;
-          }
-          currentTokenString += inputString[locationInString];
+
+      if(inputString.at(locationInString) == '\n') {
+          currentLineNumber++;
       }
+      if(inputString.at(locationInString) != ' ' && inputString.at(locationInString) != '\n')
+        currentTokenString += inputString[locationInString];
 
       lastStateNotFinal = true;
       locationInString++;
   }
+
+  //this is to handle the scanner being called for the last token in the file
+  //the scanner function will not update the state if the position reaches the end of the file
+  //so it needs to be handled here
+  state = stateTable[state][getCharacterColumn(NEWLINE_WHITESPACE_COL)]; 
+  currentTokenString = cleanTokenString(currentTokenString);
+  if(stateIsIdent(state)) {
+      state = matchIdToKeyword(currentTokenString);
+  }
+  //struct token *myToken = new struct token;
+  myToken->tokenId = state;
+  myToken->tokenName = getTokenName(state);
+  myToken->matchingString = currentTokenString;
+  myToken->lineNumber = currentLineNumber;
+  lastStateNotFinal = false;
+  return;
 
 }
 
@@ -243,11 +268,11 @@ string cleanTokenString(string ident) {
     return ident;
 }
 
-void printToken(token myToken) {
-    cout << "Token ID: " << myToken.tokenId << endl;
-    cout << "Token Name: " << myToken.tokenName << endl;
-    cout << "Matching String: " << myToken.matchingString << endl;
-    cout << "Line Number: " << myToken.lineNumber << endl;
+void printToken(token *myToken) {
+    cout << "Token ID: " << myToken->tokenId << endl;
+    cout << "Token Name: " << myToken->tokenName << endl;
+    cout << "Matching String: " << myToken->matchingString << endl;
+    cout << "Line Number: " << myToken->lineNumber << endl;
 }
 
 int isNewLine(int asciiChar) {
