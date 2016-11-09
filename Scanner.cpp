@@ -132,13 +132,10 @@ int processData(char *argv[], int argc) {
 int scan(string inputString) {
   struct token *myToken = new struct token;
   currentLineNumber = 1;
+  Node *root = new Node;
 
   scanner(myToken);
-  printToken(myToken);
-  //delete myToken;
-  //myToken = NULL;
-  scanner(myToken);
-  printToken(myToken);
+  program(root, myToken);
 
   return 0;
 }
@@ -205,6 +202,141 @@ void scanner(struct token* myToken) {
   lastStateNotFinal = false;
   return;
 
+}
+
+void initNode(Node *node, string label) {
+  node->label = label;
+  node->token1.tokenId = -1;
+  node->token2.tokenId = -1;
+  node->child1 = NULL;
+  node->child2 = NULL;
+  node->child3 = NULL;
+  node->child4 = NULL;
+}
+
+void program(Node *node, struct token *myToken) {
+  initNode(node, "<program>");
+  node->child1 = vars(myToken);
+  scanner(myToken);
+  node->child2 = block(myToken);
+}
+
+Node *block(struct token *myToken) {
+  Node *node = new Node;
+  initNode(node, "<block>");
+  
+}
+
+Node *vars(struct token *myToken) {
+  Node *node = new Node;
+  initNode(node, "<vars>");
+  if(myToken->tokenName == "Var_tk") {
+    scanner(myToken);
+    if(myToken->tokenName == "Id_tk") {
+      node->token1 = returnInstance(myToken);
+      node->child1 = mvars(myToken);
+    }
+    else {
+      cout << "Expected Identifier after keyword 'Var'\n";
+      exit(-1);
+    }
+  }
+  else {
+    delete node;
+    node = NULL;
+    return NULL;
+  }
+}
+
+Node *mvars(struct token *myToken) {
+  Node *node = new Node;
+  initNode(node, "<mvars>");
+
+
+}
+
+Node *expr(struct token *myToken) {
+  Node *node = new Node;
+  node->label = "<expr>";
+
+}
+
+Node *M(struct token *myToken) {
+  Node *node = new Node;
+  node->label = "<M>";
+
+}
+
+Node *T(struct token *myToken) {
+  Node *node = new Node;
+  node->label = "<T>";
+
+}
+
+Node *R(struct token *myToken) {
+  Node *node = new Node;
+  node->label = "<R>";
+
+}
+
+Node *stats(struct token *myToken) {
+  Node *node = new Node;
+  node->label = "<stats>";
+
+}
+
+Node *mstats(struct token *myToken) {
+  Node *node = new Node;
+  node->label = "<mstats>";
+
+}
+
+Node *stat(struct token *myToken) {
+  Node *node = new Node;
+  node->label = "<stat>";
+
+}
+
+Node *in(struct token *myToken) {
+  Node *node = new Node;
+  node->label = "<in>";
+
+}
+
+Node *out(struct token *myToken) {
+  Node *node = new Node;
+  node->label = "<out>";
+
+}
+
+Node *ifs(struct token *myToken) {
+  Node *node = new Node;
+  node->label = "<if>";
+
+}
+
+Node *loop(struct token *myToken) {
+  Node *node = new Node;
+  node->label = "<loop>";
+
+}
+
+Node *assign(struct token *myToken) {
+  Node *node = new Node;
+  node->label = "<assign>";
+
+}
+
+Node *RO(struct token *myToken) {
+  Node *node = new Node;
+  node->label = "<RO>";
+
+}
+
+struct token returnInstance(struct token *myToken) {
+  struct token *temp = new struct token;
+  temp = myToken;
+  return *temp;
 }
 
 int getCharacterColumn(char myChar) {

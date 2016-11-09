@@ -13,9 +13,29 @@ int scan(std::string);
 //Token functions
 void scanner(struct token*);
 std::string getTokenName(int);
+struct token returnInstance(struct token*);
 void printToken(token*);
 
 //Node functions
+void initNode(Node*, std::string);
+void program(Node*, struct token*);
+Node *block(struct token*);
+Node *vars(struct token*);
+Node *mvars(struct token*);
+Node *expr(struct token*);
+Node *M(struct token*);
+Node *T(struct token*);
+Node *F(struct token*);
+Node *R(struct token*);
+Node *stats(struct token*);
+Node *mstats(struct token*);
+Node *stat(struct token*);
+Node *in(struct token*);
+Node *out(struct token*);
+Node *ifs(struct token*);
+Node *loop(struct token*);
+Node *assign(struct token*);
+Node *RO(struct token*);
 
 //Parsing functions
 int checkIfValidCharacter(char);

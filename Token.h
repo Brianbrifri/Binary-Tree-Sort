@@ -123,13 +123,13 @@ struct token {
     int lineNumber;
 };
 
-struct node {
+struct Node {
     std::string label;
     struct token token1;
     struct token token2;
-    struct node *child1;
-    struct node *child2;
-    struct node *child3;
-    struct node *child4;
+    struct Node *child1;
+    struct Node *child2;
+    struct Node *child3;
+    struct Node *child4;
 };
 #endif
