@@ -135,8 +135,10 @@ int scan(string inputString) {
   Node *root = new Node;
 
   scanner(myToken);
+  cout << myToken->matchingString << endl;
   program(root, myToken);
 
+  cout << root->child1->token1.tokenName << endl;
   return 0;
 }
 
@@ -179,8 +181,12 @@ void scanner(struct token* myToken) {
       if(inputString.at(locationInString) == '\n') {
           currentLineNumber++;
       }
-      if(inputString.at(locationInString) != ' ' && inputString.at(locationInString) != '\n')
-        currentTokenString += inputString[locationInString];
+
+      if(lastStateNotFinal) {
+        if(inputString.at(locationInString) != ' ' && inputString.at(locationInString) != '\n')
+          currentTokenString += inputString[locationInString];
+          cout << currentTokenString << endl;
+      }
 
       lastStateNotFinal = true;
       locationInString++;
@@ -217,23 +223,47 @@ void initNode(Node *node, string label) {
 void program(Node *node, struct token *myToken) {
   initNode(node, "<program>");
   node->child1 = vars(myToken);
-  scanner(myToken);
   node->child2 = block(myToken);
 }
 
 Node *block(struct token *myToken) {
   Node *node = new Node;
   initNode(node, "<block>");
+  if(myToken->tokenName == "BEGIN_tk") {
+    node->child1 = vars(myToken);
+    scanner(myToken);
+    node->child2 = stats(myToken);
+    scanner(myToken);
+    if(myToken->tokenName == "END_tk") {
+      scanner(myToken);
+      if(myToken->tokenName == "EOF_tk") {
+        return node;
+      }
+      else {
+        cout << "Expected EOF_tk after END_tk\n";
+        exit(-1);
+      }
+    }
+    else {
+      cout << "Expected END_tk at end of block\n"; 
+      exit(-1);
+    }
+  }
+  else {
+    cout << "Expected BEGIN_tk at beginning of block\n";
+    exit(-1);
+  }
   
 }
 
 Node *vars(struct token *myToken) {
   Node *node = new Node;
   initNode(node, "<vars>");
-  if(myToken->tokenName == "Var_tk") {
+  if(myToken->tokenName == "VAR_tk") {
     scanner(myToken);
-    if(myToken->tokenName == "Id_tk") {
+    if(myToken->tokenName == "ID_tk") {
       node->token1 = returnInstance(myToken);
+      scanner(myToken);
       node->child1 = mvars(myToken);
     }
     else {
@@ -251,56 +281,205 @@ Node *vars(struct token *myToken) {
 Node *mvars(struct token *myToken) {
   Node *node = new Node;
   initNode(node, "<mvars>");
-
-
+  if(myToken->tokenName == "COLON_tk") {
+    scanner(myToken);
+    if(myToken->tokenName == "COLON_tk") {
+      scanner(myToken);
+      if(myToken->tokenName == "ID_tk") {
+        node->token1 = returnInstance(myToken);
+        scanner(myToken);
+        node->child1 = mvars(myToken);
+      }
+      else {
+        cout << "Expected Identifier after second colon\n";
+        exit(-1);
+      }
+    }
+    else {
+      cout << "Expected second colon before Identifier\n";
+      exit(-1);
+    }
+  }
+  else {
+    delete node;
+    node = NULL;
+    return NULL;
+  }
 }
 
 Node *expr(struct token *myToken) {
   Node *node = new Node;
-  node->label = "<expr>";
+  initNode(node, "<expr>");
+  node->child1 = M(myToken);
+  if(myToken->tokenName == "PLUS_tk") {
+    node->token1 = returnInstance(myToken);
+    scanner(myToken);
+    node->child2 = expr(myToken);
+    return node;
+  }
+  else {
+    return node;
+  }
 
 }
 
 Node *M(struct token *myToken) {
   Node *node = new Node;
-  node->label = "<M>";
-
+  initNode(node, "<M>");
+  node->child1 = T(myToken);
+  if(myToken->tokenName == "MINUS_tk") {
+    node->token1 = returnInstance(myToken);
+    scanner(myToken);
+    node->child2 = M(myToken);
+    return node;
+  }
+  else {
+    return node;
+  }
 }
 
 Node *T(struct token *myToken) {
   Node *node = new Node;
-  node->label = "<T>";
+  initNode(node, "<T>");
+  node->child1 = F(myToken);
+  if(myToken->tokenName == "MULTIPLY_tk" || myToken->tokenName == "DIVIDE_tk") {
+    node->token1 = returnInstance(myToken);
+    scanner(myToken);
+    node->child2 = T(myToken);
+    return node;
+  }
+  else {
+    return node;
+  }
 
+}
+
+Node *F(struct token *myToken) {
+  Node *node = new Node;
+  initNode(node, "<F>");
+  if(myToken->tokenName == "MINUS_tk") {
+    node->token1 = returnInstance(myToken);
+    scanner(myToken);
+    node->child1 = F(myToken);
+    return node;
+  }
+  else {
+    node->child1 = R(myToken);
+    return node;
+  }
 }
 
 Node *R(struct token *myToken) {
   Node *node = new Node;
-  node->label = "<R>";
-
+  initNode(node, "<R>");
+  if(myToken->tokenName == "OPENBRACKET_tk") {
+    scanner(myToken);
+    node->child1 = expr(myToken);
+    if(myToken->tokenName == "CLOSEBRACKET_tk") {
+      scanner(myToken);
+      return node;
+    }
+    else{
+      cout << "Expected CLOSEBRACKET_tk after expression\n";
+      exit(-1);
+    }
+  }
+  else if(myToken->tokenName == "ID_tk" || myToken->tokenName == "VAR_tk") {
+    node->token1 = returnInstance(myToken);
+    scanner(myToken);
+    return node;
+  }
+  else {
+    cout << "Expected OPENBRACKET_tk, ID_tk, or VAR_tk\n";
+    exit(-1);
+  }
 }
 
 Node *stats(struct token *myToken) {
   Node *node = new Node;
   node->label = "<stats>";
+  node->child1 = stat(myToken);
+  node->child2 = mstats(myToken);
+  return node;
 
 }
 
 Node *mstats(struct token *myToken) {
   Node *node = new Node;
-  node->label = "<mstats>";
-
+  initNode(node, "<mstats>");
+  if(myToken->tokenName == "SCAN_tk" || myToken->tokenName == "PRINT_tk" || myToken->tokenName == "OPENBRACKET_tk" ||
+     myToken->tokenName == "LOOP_tk" || myToken->tokenName == "ID_tk" || myToken->tokenName == "BEGIN_tk") {
+    node->child1 = stat(myToken);
+    node->child2 = mstats(myToken);
+    return node;
+  }
+  else {
+    delete node;
+    node == NULL;
+    return NULL;
+  }
 }
 
 Node *stat(struct token *myToken) {
   Node *node = new Node;
   node->label = "<stat>";
-
+  if(myToken->tokenName == "SCAN_tk") {
+    node->child1 = in(myToken);
+    return node;
+  }
+  else if(myToken->tokenName == "PRINT_tk") {
+    node->child1 = out(myToken);
+    return node;
+  }
+  else if(myToken->tokenName == "OPENBRACKET_tk") {
+    node->child1 = ifs(myToken);
+    return node;
+  }
+  else if(myToken->tokenName == "LOOP_tk") {
+    node->child1 = loop(myToken);
+    return node;
+  }
+  else if(myToken->tokenName == "ID_tk") {
+    node->child1 = assign(myToken);
+    return node;
+  }
+  else if(myToken->tokenName == "BEGIN_tk") {
+    node->child1 = block(myToken);
+    return node;
+  }
+  else {
+    cout << "Expected SCAN_tk, PRINT_tk, OPENBRACKET_tk, LOOP_tk, ID_tk, or BEGIN_tk\n";
+    exit(-1);
+  }
 }
 
 Node *in(struct token *myToken) {
   Node *node = new Node;
-  node->label = "<in>";
-
+  initNode(node, "<in>");
+  scanner(myToken);
+  if(myToken->tokenName == "COLON_tk") {
+    scanner(myToken);
+    if(myToken->tokenName == "ID_tk") {
+      node->token1 = returnInstance(myToken);
+      scanner(myToken);
+      if(myToken->tokenName == "PERIOD_tk") {
+        scanner(myToken);
+        return node;
+      }
+      else {
+        cout << "Expected PERIOD_tk after ID_tk on line " << myToken->lineNumber << endl;
+        exit(-1);
+      }
+    }
+    else {
+      cout << "Expected ID_tk after COLON_tk on line " << myToken->lineNumber << endl;
+      exit(-1);
+    }
+  }
+  else {
+    cout << "Expected COLON_tk after SCAN_tk on line " << myToken->lineNumber << endl;
+    exit(-1);
+  }
 }
 
 Node *out(struct token *myToken) {
