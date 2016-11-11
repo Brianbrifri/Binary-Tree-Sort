@@ -36,6 +36,7 @@ Node *ifs(struct token*);
 Node *loop(struct token*);
 Node *assign(struct token*);
 Node *RO(struct token*);
+void printNodes(Node*, int);
 
 //Parsing functions
 int checkIfValidCharacter(char);

@@ -363,25 +363,25 @@ Node *F(struct token *myToken) {
 Node *R(struct token *myToken) {
   Node *node = new Node;
   initNode(node, "<R>");
-  if(myToken->tokenName == "OPENBRACKET_tk") {
+  if(myToken->tokenName == "OPENBRACES_tk") {
     scanner(myToken);
     node->child1 = expr(myToken);
-    if(myToken->tokenName == "CLOSEBRACKET_tk") {
+    if(myToken->tokenName == "CLOSEBRACES_tk") {
       scanner(myToken);
       return node;
     }
     else{
-      cout << "Expected CLOSEBRACKET_tk after expression on line " << myToken->lineNumber << endl;
+      cout << "Expected CLOSEBRACES_tk after expression on line " << myToken->lineNumber << endl;
       exit(-1);
     }
   }
-  else if(myToken->tokenName == "ID_tk" || myToken->tokenName == "VAR_tk") {
+  else if(myToken->tokenName == "ID_tk" || myToken->tokenName == "DIGIT_tk") {
     node->token1 = returnInstance(myToken);
     scanner(myToken);
     return node;
   }
   else {
-    cout << "Expected OPENBRACKET_tk, ID_tk, or VAR_tk on line " << myToken->lineNumber << endl;
+    cout << "Expected OPENBRACES_tk, ID_tk, or DIGIT_tk on line " << myToken->lineNumber << endl;
     exit(-1);
   }
 }
@@ -398,7 +398,7 @@ Node *stats(struct token *myToken) {
 Node *mstats(struct token *myToken) {
   Node *node = new Node;
   initNode(node, "<mstats>");
-  if(myToken->tokenName == "SCAN_tk" || myToken->tokenName == "PRINT_tk" || myToken->tokenName == "OPENBRACKET_tk" ||
+  if(myToken->tokenName == "SCAN_tk" || myToken->tokenName == "PRINT_tk" || myToken->tokenName == "OPENBRACES_tk" ||
      myToken->tokenName == "LOOP_tk" || myToken->tokenName == "ID_tk" || myToken->tokenName == "BEGIN_tk") {
     node->child1 = stat(myToken);
     node->child2 = mstats(myToken);
@@ -422,7 +422,7 @@ Node *stat(struct token *myToken) {
     node->child1 = out(myToken);
     return node;
   }
-  else if(myToken->tokenName == "OPENBRACKET_tk") {
+  else if(myToken->tokenName == "OPENBRACES_tk") {
     node->child1 = ifs(myToken);
     return node;
   }
@@ -439,7 +439,7 @@ Node *stat(struct token *myToken) {
     return node;
   }
   else {
-    cout << "Expected SCAN_tk, PRINT_tk, OPENBRACKET_tk, LOOP_tk, ID_tk, or BEGIN_tk on line " << myToken->lineNumber << endl;
+    cout << "Expected SCAN_tk, PRINT_tk, OPENBRACES_tk, LOOP_tk, ID_tk, or BEGIN_tk on line " << myToken->lineNumber << endl;
     exit(-1);
   }
 }
@@ -477,27 +477,27 @@ Node *out(struct token *myToken) {
   Node *node = new Node;
   initNode(node, "<out>");
   scanner(myToken);
-  if(myToken->tokenName == "OPENBRACKET_tk") {
+  if(myToken->tokenName == "OPENBRACES_tk") {
     scanner(myToken);
     node->child1 = expr(myToken);
-    if(myToken->tokenName == "CLOSEBRACKET_tk") {
+    if(myToken->tokenName == "CLOSEBRACES_tk") {
       scanner(myToken);
       if(myToken->tokenName == "PERIOD_tk") {
         scanner(myToken);
         return node;
       }
       else {
-        cout << "Expected PERIOD_tk after CLOSEBRACKET_tk on line " << myToken->lineNumber << endl;
+        cout << "Expected PERIOD_tk after CLOSEBRACES_tk on line " << myToken->lineNumber << endl;
         exit(-1);
       }
     }
     else {
-      cout << "Expected CLOSEBRACKET_tk after expression on line " << myToken->lineNumber << endl;
+      cout << "Expected CLOSEBRACES_tk after expression on line " << myToken->lineNumber << endl;
       exit(-1);
     }
   }
   else {
-    cout << "Expected OPENBRACKET_tk after PRINT_tk on line " << myToken->lineNumber << endl;
+    cout << "Expected OPENBRACES_tk after PRINT_tk on line " << myToken->lineNumber << endl;
     exit(-1);
   }
 }
@@ -509,7 +509,7 @@ Node *ifs(struct token *myToken) {
   node->child1 = expr(myToken);
   node->child2 = RO(myToken);
   node->child3 = expr(myToken);
-  if(myToken->tokenName == "CLOSEBRACKET_tk") {
+  if(myToken->tokenName == "CLOSEBRACES_tk") {
     scanner(myToken);
     if(myToken->tokenName == "IFF_tk") {
       scanner(myToken);
@@ -517,12 +517,12 @@ Node *ifs(struct token *myToken) {
       return node;
     }
     else {
-      cout << "Expected IFF_tk after CLOSEBRACKET_tk on line " << myToken->lineNumber << endl;
+      cout << "Expected IFF_tk after CLOSEBRACES_tk on line " << myToken->lineNumber << endl;
       exit(-1);
     }
   }
   else {
-    cout << "Expected CLOSEBRACKET_tk after expr on line " << myToken->lineNumber << endl;
+    cout << "Expected CLOSEBRACES_tk after expr on line " << myToken->lineNumber << endl;
     exit(-1);
   }
 }
@@ -531,23 +531,23 @@ Node *loop(struct token *myToken) {
   Node *node = new Node;
   initNode(node, "<loop>");
   scanner(myToken);
-  if(myToken->tokenName == "OPENBRACKET_tk") {
+  if(myToken->tokenName == "OPENBRACES_tk") {
     scanner(myToken);
     node->child1 = expr(myToken);
     node->child2 = RO(myToken);
     node->child3 = expr(myToken);
-    if(myToken->tokenName == "CLOSEBRACKET_tk") {
+    if(myToken->tokenName == "CLOSEBRACES_tk") {
       scanner(myToken);
       node->child4 = block(myToken);
       return node;
     }
     else {
-      cout << "Expected CLOSEBRACKET_tk after expr on line " << myToken->lineNumber << endl;
+      cout << "Expected CLOSEBRACES_tk after expr on line " << myToken->lineNumber << endl;
       exit(-1);
     }
   }
   else {
-    cout << "Expectred OPENBRACKET_tk after LOOP_tk on line " << myToken->lineNumber << endl;
+    cout << "Expectred OPENBRACES_tk after LOOP_tk on line " << myToken->lineNumber << endl;
     exit(-1);
   }
 }
@@ -588,6 +588,10 @@ struct token returnInstance(struct token *myToken) {
   struct token *temp = new struct token;
   temp = myToken;
   return *temp;
+}
+
+void printNodes(Node *root, int level) {
+
 }
 
 int getCharacterColumn(char myChar) {
@@ -652,10 +656,10 @@ string cleanTokenString(string ident) {
 }
 
 void printToken(token *myToken) {
-    cout << "Token ID: " << myToken->tokenId << endl;
-    cout << "Token Name: " << myToken->tokenName << endl;
-    cout << "Matching String: " << myToken->matchingString << endl;
-    cout << "Line Number: " << myToken->lineNumber << endl;
+    cout << "Token ID: " << myToken->tokenId << " ";
+    cout << "Token Name: " << myToken->tokenName << " ";
+    cout << "Matching String: " << myToken->matchingString << " ";
+    cout << "Line Number: " << myToken->lineNumber << " ";
 }
 
 int isNewLine(int asciiChar) {
