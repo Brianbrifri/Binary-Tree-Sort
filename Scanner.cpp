@@ -134,11 +134,13 @@ int scan(string fileName) {
   currentLineNumber = 1;
   Node *root = new Node;
 
+  fileName = fileName + ".out";
   scanner(myToken);
-  program(root, myToken);
+  root = program(myToken);
 
   ofstream file;
-  file.open(preName.c_str());
+  file.open(fileName.c_str());
+  cout << endl << endl;
   printTree(root, 0, file);
   return 0;
 }
@@ -162,7 +164,7 @@ void scanner(struct token* myToken) {
      state = stateTable[state][getCharacterColumn(inputString[locationInString])]; 
       if(state >= 1000) {
           currentTokenString = cleanTokenString(currentTokenString);
-          cout << currentTokenString << endl;
+          cout << currentTokenString << " ";
           if(stateIsIdent(state)) {
               state = matchIdToKeyword(currentTokenString);
           }
@@ -221,10 +223,12 @@ void initNode(Node *node, string label) {
   node->child4 = NULL;
 }
 
-void program(Node *node, struct token *myToken) {
+Node *program(struct token *myToken) {
+  Node *node = new Node;
   initNode(node, "<program>");
   node->child1 = vars(myToken);
   node->child2 = block(myToken);
+  return node;
 }
 
 Node *block(struct token *myToken) {
@@ -259,6 +263,7 @@ Node *vars(struct token *myToken) {
       node->token1 = returnInstance(myToken);
       scanner(myToken);
       node->child1 = mvars(myToken);
+      return node;
     }
     else {
       cout << "Expected ID_tk after VAR_tk on line " << myToken->lineNumber << endl;
@@ -283,6 +288,7 @@ Node *mvars(struct token *myToken) {
         node->token1 = returnInstance(myToken);
         scanner(myToken);
         node->child1 = mvars(myToken);
+        return node;
       }
       else {
         cout << "Expected ID_tk after COLON_tk on line " << myToken->lineNumber << endl;
@@ -590,7 +596,6 @@ Node *RO(struct token *myToken) {
 struct token returnInstance(struct token *myToken) {
   struct token *temp = new struct token;
   temp = myToken;
-  cout << "returning instance\n";
   return *temp;
 }
 

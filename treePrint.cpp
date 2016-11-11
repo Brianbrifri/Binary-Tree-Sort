@@ -3,7 +3,6 @@
 
 void printTree(Node *node, int level, ofstream &file) {
   if(node) {
-    cout << "checking node token: " << node->token1.tokenId << endl;
     if(node->token1.tokenId > 0) {
       for(int i = 0; i < level; i++) {
         cout << "  ";

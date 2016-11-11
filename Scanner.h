@@ -19,7 +19,7 @@ void printToken(token*);
 
 //Node functions
 void initNode(Node*, std::string);
-void program(Node*, struct token*);
+Node *program(struct token*);
 Node *block(struct token*);
 Node *vars(struct token*);
 Node *mvars(struct token*);
