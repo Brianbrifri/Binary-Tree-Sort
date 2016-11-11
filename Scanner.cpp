@@ -570,7 +570,14 @@ Node *assign(struct token *myToken) {
     node->token2 = returnInstance(myToken);
     scanner(myToken);
     node->child1 = expr(myToken);
-    return node;
+    if(myToken->tokenName == "PERIOD_tk") {
+      scanner(myToken);
+      return node;
+    }
+    else {
+      cout << "Expected PERIOD_tk after expression on line " << myToken->lineNumber << endl;
+      exit(-1);
+    }
   }
   else {
     cout << "Expected EQUALTO_tk after ID_tk on line " << myToken->lineNumber << endl;

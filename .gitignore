@@ -3,4 +3,5 @@
 a.out
 testScanner
 .idea/**/*
-adtuff.*
+*.out
+*.fs16
