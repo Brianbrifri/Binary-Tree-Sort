@@ -135,10 +135,8 @@ int scan(string inputString) {
   Node *root = new Node;
 
   scanner(myToken);
-  cout << myToken->matchingString << endl;
   program(root, myToken);
 
-  cout << root->child1->token1.tokenName << endl;
   return 0;
 }
 
@@ -161,6 +159,7 @@ void scanner(struct token* myToken) {
      state = stateTable[state][getCharacterColumn(inputString[locationInString])]; 
       if(state >= 1000) {
           currentTokenString = cleanTokenString(currentTokenString);
+          cout << currentTokenString << endl;
           if(stateIsIdent(state)) {
               state = matchIdToKeyword(currentTokenString);
           }
@@ -185,7 +184,6 @@ void scanner(struct token* myToken) {
       if(lastStateNotFinal) {
         if(inputString.at(locationInString) != ' ' && inputString.at(locationInString) != '\n')
           currentTokenString += inputString[locationInString];
-          cout << currentTokenString << endl;
       }
 
       lastStateNotFinal = true;
@@ -230,19 +228,12 @@ Node *block(struct token *myToken) {
   Node *node = new Node;
   initNode(node, "<block>");
   if(myToken->tokenName == "BEGIN_tk") {
+    scanner(myToken);
     node->child1 = vars(myToken);
-    scanner(myToken);
     node->child2 = stats(myToken);
-    scanner(myToken);
     if(myToken->tokenName == "END_tk") {
       scanner(myToken);
-      if(myToken->tokenName == "EOF_tk") {
-        return node;
-      }
-      else {
-        cout << "Expected EOF_tk after END_tk\n";
-        exit(-1);
-      }
+      return node;
     }
     else {
       cout << "Expected END_tk at end of block\n"; 
@@ -448,7 +439,7 @@ Node *stat(struct token *myToken) {
     return node;
   }
   else {
-    cout << "Expected SCAN_tk, PRINT_tk, OPENBRACKET_tk, LOOP_tk, ID_tk, or BEGIN_tk\n";
+    cout << "Expected SCAN_tk, PRINT_tk, OPENBRACKET_tk, LOOP_tk, ID_tk, or BEGIN_tk on line " << myToken->lineNumber << endl;
     exit(-1);
   }
 }
@@ -484,32 +475,113 @@ Node *in(struct token *myToken) {
 
 Node *out(struct token *myToken) {
   Node *node = new Node;
-  node->label = "<out>";
-
+  initNode(node, "<out>");
+  scanner(myToken);
+  if(myToken->tokenName == "OPENBRACKET_tk") {
+    scanner(myToken);
+    node->child1 = expr(myToken);
+    if(myToken->tokenName == "CLOSEBRACKET_tk") {
+      scanner(myToken);
+      if(myToken->tokenName == "PERIOD_tk") {
+        scanner(myToken);
+        return node;
+      }
+      else {
+        cout << "Expected PERIOD_tk after CLOSEBRACKET_tk on line " << myToken->lineNumber << endl;
+        exit(-1);
+      }
+    }
+    else {
+      cout << "Expected CLOSEBRACKET_tk after expression on line " << myToken->lineNumber << endl;
+      exit(-1);
+    }
+  }
+  else {
+    cout << "Expected OPENBRACKET_tk after PRINT_tk on line " << myToken->lineNumber << endl;
+    exit(-1);
+  }
 }
 
 Node *ifs(struct token *myToken) {
   Node *node = new Node;
-  node->label = "<if>";
-
+  initNode(node, "<if>");
+  scanner(myToken);
+  node->child1 = expr(myToken);
+  node->child2 = RO(myToken);
+  node->child3 = expr(myToken);
+  if(myToken->tokenName == "CLOSEBRACKET_tk") {
+    scanner(myToken);
+    if(myToken->tokenName == "IFF_tk") {
+      scanner(myToken);
+      node->child4 = block(myToken);
+      return node;
+    }
+    else {
+      cout << "Expected IFF_tk after CLOSEBRACKET_tk on line " << myToken->lineNumber << endl;
+      exit(-1);
+    }
+  }
+  else {
+    cout << "Expected CLOSEBRACKET_tk after expr on line " << myToken->lineNumber << endl;
+    exit(-1);
+  }
 }
 
 Node *loop(struct token *myToken) {
   Node *node = new Node;
-  node->label = "<loop>";
-
+  initNode(node, "<loop>");
+  scanner(myToken);
+  if(myToken->tokenName == "OPENBRACKET_tk") {
+    scanner(myToken);
+    node->child1 = expr(myToken);
+    node->child2 = RO(myToken);
+    node->child3 = expr(myToken);
+    if(myToken->tokenName == "CLOSEBRACKET_tk") {
+      scanner(myToken);
+      node->child4 = block(myToken);
+      return node;
+    }
+    else {
+      cout << "Expected CLOSEBRACKET_tk after expr on line " << myToken->lineNumber << endl;
+      exit(-1);
+    }
+  }
+  else {
+    cout << "Expectred OPENBRACKET_tk after LOOP_tk on line " << myToken->lineNumber << endl;
+    exit(-1);
+  }
 }
 
 Node *assign(struct token *myToken) {
   Node *node = new Node;
-  node->label = "<assign>";
-
+  initNode(node, "<assign>");
+  node->token1 = returnInstance(myToken);
+  scanner(myToken);
+  if(myToken->tokenName == "EQUALTO_tk") {
+    node->token2 = returnInstance(myToken);
+    scanner(myToken);
+    node->child1 = expr(myToken);
+    return node;
+  }
+  else {
+    cout << "Expected EQUALTO_tk after ID_tk on line " << myToken->lineNumber << endl;
+    exit(-1);
+  }
 }
 
 Node *RO(struct token *myToken) {
   Node *node = new Node;
-  node->label = "<RO>";
-
+  initNode(node, "<RO>");
+  if(myToken->tokenName == "GREATEREQUALS_tk" || myToken->tokenName == "LESSEQUALS_tk" || myToken->tokenName == "EQUALS_tk" ||
+     myToken->tokenName == "GREATERTHAN_tk" || myToken->tokenName == "LESSTHAN_tk" || myToken->tokenName == "NOTEQUALTO_tk") {
+    node->token1 = returnInstance(myToken);
+    scanner(myToken);
+    return node;
+  }
+  else {
+    cout << "Expected relational operator on line " << myToken->lineNumber << endl;
+    exit(-1);
+  }
 }
 
 struct token returnInstance(struct token *myToken) {
