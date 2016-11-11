@@ -236,12 +236,12 @@ Node *block(struct token *myToken) {
       return node;
     }
     else {
-      cout << "Expected END_tk at end of block\n"; 
+      cout << "Expected END_tk at end of block on line " << myToken->lineNumber << endl; 
       exit(-1);
     }
   }
   else {
-    cout << "Expected BEGIN_tk at beginning of block\n";
+    cout << "Expected BEGIN_tk at beginning of block on line " << myToken->lineNumber << endl;
     exit(-1);
   }
   
@@ -258,7 +258,7 @@ Node *vars(struct token *myToken) {
       node->child1 = mvars(myToken);
     }
     else {
-      cout << "Expected Identifier after keyword 'Var'\n";
+      cout << "Expected ID_tk after VAR_tk on line " << myToken->lineNumber << endl;
       exit(-1);
     }
   }
@@ -282,12 +282,12 @@ Node *mvars(struct token *myToken) {
         node->child1 = mvars(myToken);
       }
       else {
-        cout << "Expected Identifier after second colon\n";
+        cout << "Expected ID_tk after COLON_tk on line " << myToken->lineNumber << endl;
         exit(-1);
       }
     }
     else {
-      cout << "Expected second colon before Identifier\n";
+      cout << "Expected COLON_tk after COLON_tk on line " << myToken->lineNumber << endl;
       exit(-1);
     }
   }
@@ -371,7 +371,7 @@ Node *R(struct token *myToken) {
       return node;
     }
     else{
-      cout << "Expected CLOSEBRACKET_tk after expression\n";
+      cout << "Expected CLOSEBRACKET_tk after expression on line " << myToken->lineNumber << endl;
       exit(-1);
     }
   }
@@ -381,7 +381,7 @@ Node *R(struct token *myToken) {
     return node;
   }
   else {
-    cout << "Expected OPENBRACKET_tk, ID_tk, or VAR_tk\n";
+    cout << "Expected OPENBRACKET_tk, ID_tk, or VAR_tk on line " << myToken->lineNumber << endl;
     exit(-1);
   }
 }
