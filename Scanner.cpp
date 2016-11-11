@@ -125,11 +125,11 @@ int processData(char *argv[], int argc) {
     }
 
     //Return the results of the scan on the input string
-    return scan(inputString);
+    return scan(preName);
 
 }
 
-int scan(string inputString) {
+int scan(string fileName) {
   struct token *myToken = new struct token;
   currentLineNumber = 1;
   Node *root = new Node;
@@ -137,6 +137,9 @@ int scan(string inputString) {
   scanner(myToken);
   program(root, myToken);
 
+  ofstream file;
+  file.open(preName.c_str());
+  printTree(root, 0, file);
   return 0;
 }
 
@@ -388,7 +391,7 @@ Node *R(struct token *myToken) {
 
 Node *stats(struct token *myToken) {
   Node *node = new Node;
-  node->label = "<stats>";
+  initNode(node, "<stats>");
   node->child1 = stat(myToken);
   node->child2 = mstats(myToken);
   return node;
@@ -413,7 +416,7 @@ Node *mstats(struct token *myToken) {
 
 Node *stat(struct token *myToken) {
   Node *node = new Node;
-  node->label = "<stat>";
+  initNode(node, "<stat>");
   if(myToken->tokenName == "SCAN_tk") {
     node->child1 = in(myToken);
     return node;
@@ -587,11 +590,8 @@ Node *RO(struct token *myToken) {
 struct token returnInstance(struct token *myToken) {
   struct token *temp = new struct token;
   temp = myToken;
+  cout << "returning instance\n";
   return *temp;
-}
-
-void printNodes(Node *root, int level) {
-
 }
 
 int getCharacterColumn(char myChar) {
