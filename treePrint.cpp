@@ -35,9 +35,9 @@ void printTree(Node *node, int level, ofstream &file) {
         file << node->token2.lineNumber << "\n";
       }
     }
-    printTree(node->child1, level++, file);
-    printTree(node->child2, level++, file);
-    printTree(node->child3, level++, file);
-    printTree(node->child4, level++, file);
+    printTree(node->child1, level + 1, file);
+    printTree(node->child2, level + 1, file);
+    printTree(node->child3, level + 1, file);
+    printTree(node->child4, level + 1, file);
   }
 }
