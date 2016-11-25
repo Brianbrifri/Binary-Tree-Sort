@@ -11,4 +11,4 @@ treePrint.o: treePrint.cpp treePrint.h
 
 .PHONY: clean
 clean:
-	-rm testScanner $(objects)
+	-rm testScanner $(objects) *.out
