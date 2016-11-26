@@ -133,10 +133,11 @@ int scan(string fileName) {
   struct token *myToken = new struct token;
   currentLineNumber = 1;
   Node *root = new Node;
+  Stack *stack = new Stack();
 
   fileName = fileName + ".out";
   scanner(myToken);
-  root = program(myToken);
+  root = program(myToken, stack);
 
   ofstream file;
   file.open(fileName.c_str());
@@ -168,7 +169,6 @@ void scanner(struct token* myToken) {
           if(stateIsIdent(state)) {
               state = matchIdToKeyword(currentTokenString);
           }
-          //struct token *myToken = new struct token;
           myToken->tokenId = state;
           myToken->tokenName = getTokenName(state);
           myToken->matchingString = currentTokenString;
@@ -177,7 +177,6 @@ void scanner(struct token* myToken) {
           return;
       }
       if(state == FSA_ERROR) {
-         //struct token *myToken = new struct token;
          myToken->tokenId = FSA_ERROR;
          return;
       }
@@ -203,7 +202,6 @@ void scanner(struct token* myToken) {
   if(stateIsIdent(state)) {
       state = matchIdToKeyword(currentTokenString);
   }
-  //struct token *myToken = new struct token;
   myToken->tokenId = state;
   myToken->tokenName = getTokenName(state);
   myToken->matchingString = currentTokenString;
@@ -223,21 +221,23 @@ void initNode(Node *node, string label) {
   node->child4 = NULL;
 }
 
-Node *program(struct token *myToken) {
+Node *program(struct token *myToken, Stack *stack) {
   Node *node = new Node;
   initNode(node, "<program>");
-  node->child1 = vars(myToken);
-  node->child2 = block(myToken);
+  int varCount = 0;
+  node->child1 = vars(myToken, stack);
+  node->child2 = block(myToken, stack);
   return node;
 }
 
-Node *block(struct token *myToken) {
+Node *block(struct token *myToken, Stack *stack) {
   Node *node = new Node;
   initNode(node, "<block>");
+  int varCount = 0;
   if(myToken->tokenName == "BEGIN_tk") {
     scanner(myToken);
-    node->child1 = vars(myToken);
-    node->child2 = stats(myToken);
+    node->child1 = vars(myToken, stack);
+    node->child2 = stats(myToken, stack);
     if(myToken->tokenName == "END_tk") {
       scanner(myToken);
       return node;
@@ -254,7 +254,7 @@ Node *block(struct token *myToken) {
   
 }
 
-Node *vars(struct token *myToken) {
+Node *vars(struct token *myToken, Stack *stack) {
   Node *node = new Node;
   initNode(node, "<vars>");
   if(myToken->tokenName == "VAR_tk") {
@@ -262,7 +262,7 @@ Node *vars(struct token *myToken) {
     if(myToken->tokenName == "ID_tk") {
       node->token1 = returnInstance(myToken);
       scanner(myToken);
-      node->child1 = mvars(myToken);
+      node->child1 = mvars(myToken, stack);
       return node;
     }
     else {
@@ -277,7 +277,7 @@ Node *vars(struct token *myToken) {
   }
 }
 
-Node *mvars(struct token *myToken) {
+Node *mvars(struct token *myToken, Stack *stack) {
   Node *node = new Node;
   initNode(node, "<mvars>");
   if(myToken->tokenName == "COLON_tk") {
@@ -287,7 +287,7 @@ Node *mvars(struct token *myToken) {
       if(myToken->tokenName == "ID_tk") {
         node->token1 = returnInstance(myToken);
         scanner(myToken);
-        node->child1 = mvars(myToken);
+        node->child1 = mvars(myToken, stack);
         return node;
       }
       else {
@@ -307,14 +307,14 @@ Node *mvars(struct token *myToken) {
   }
 }
 
-Node *expr(struct token *myToken) {
+Node *expr(struct token *myToken, Stack *stack) {
   Node *node = new Node;
   initNode(node, "<expr>");
-  node->child1 = M(myToken);
+  node->child1 = M(myToken, stack);
   if(myToken->tokenName == "PLUS_tk") {
     node->token1 = returnInstance(myToken);
     scanner(myToken);
-    node->child2 = expr(myToken);
+    node->child2 = expr(myToken, stack);
     return node;
   }
   else {
@@ -323,14 +323,14 @@ Node *expr(struct token *myToken) {
 
 }
 
-Node *M(struct token *myToken) {
+Node *M(struct token *myToken, Stack *stack) {
   Node *node = new Node;
   initNode(node, "<M>");
-  node->child1 = T(myToken);
+  node->child1 = T(myToken, stack);
   if(myToken->tokenName == "MINUS_tk") {
     node->token1 = returnInstance(myToken);
     scanner(myToken);
-    node->child2 = M(myToken);
+    node->child2 = M(myToken, stack);
     return node;
   }
   else {
@@ -338,14 +338,14 @@ Node *M(struct token *myToken) {
   }
 }
 
-Node *T(struct token *myToken) {
+Node *T(struct token *myToken, Stack *stack) {
   Node *node = new Node;
   initNode(node, "<T>");
-  node->child1 = F(myToken);
+  node->child1 = F(myToken, stack);
   if(myToken->tokenName == "MULTIPLY_tk" || myToken->tokenName == "DIVIDE_tk") {
     node->token1 = returnInstance(myToken);
     scanner(myToken);
-    node->child2 = T(myToken);
+    node->child2 = T(myToken, stack);
     return node;
   }
   else {
@@ -354,27 +354,27 @@ Node *T(struct token *myToken) {
 
 }
 
-Node *F(struct token *myToken) {
+Node *F(struct token *myToken, Stack *stack) {
   Node *node = new Node;
   initNode(node, "<F>");
   if(myToken->tokenName == "MINUS_tk") {
     node->token1 = returnInstance(myToken);
     scanner(myToken);
-    node->child1 = F(myToken);
+    node->child1 = F(myToken, stack);
     return node;
   }
   else {
-    node->child1 = R(myToken);
+    node->child1 = R(myToken, stack);
     return node;
   }
 }
 
-Node *R(struct token *myToken) {
+Node *R(struct token *myToken, Stack *stack) {
   Node *node = new Node;
   initNode(node, "<R>");
   if(myToken->tokenName == "OPENBRACES_tk") {
     scanner(myToken);
-    node->child1 = expr(myToken);
+    node->child1 = expr(myToken, stack);
     if(myToken->tokenName == "CLOSEBRACES_tk") {
       scanner(myToken);
       return node;
@@ -395,22 +395,22 @@ Node *R(struct token *myToken) {
   }
 }
 
-Node *stats(struct token *myToken) {
+Node *stats(struct token *myToken, Stack *stack) {
   Node *node = new Node;
   initNode(node, "<stats>");
-  node->child1 = stat(myToken);
-  node->child2 = mstats(myToken);
+  node->child1 = stat(myToken, stack);
+  node->child2 = mstats(myToken, stack);
   return node;
 
 }
 
-Node *mstats(struct token *myToken) {
+Node *mstats(struct token *myToken, Stack *stack) {
   Node *node = new Node;
   initNode(node, "<mstats>");
   if(myToken->tokenName == "SCAN_tk" || myToken->tokenName == "PRINT_tk" || myToken->tokenName == "OPENBRACES_tk" ||
      myToken->tokenName == "LOOP_tk" || myToken->tokenName == "ID_tk" || myToken->tokenName == "BEGIN_tk") {
-    node->child1 = stat(myToken);
-    node->child2 = mstats(myToken);
+    node->child1 = stat(myToken, stack);
+    node->child2 = mstats(myToken, stack);
     return node;
   }
   else {
@@ -420,31 +420,31 @@ Node *mstats(struct token *myToken) {
   }
 }
 
-Node *stat(struct token *myToken) {
+Node *stat(struct token *myToken, Stack *stack) {
   Node *node = new Node;
   initNode(node, "<stat>");
   if(myToken->tokenName == "SCAN_tk") {
-    node->child1 = in(myToken);
+    node->child1 = in(myToken, stack);
     return node;
   }
   else if(myToken->tokenName == "PRINT_tk") {
-    node->child1 = out(myToken);
+    node->child1 = out(myToken, stack);
     return node;
   }
   else if(myToken->tokenName == "OPENBRACES_tk") {
-    node->child1 = ifs(myToken);
+    node->child1 = ifs(myToken, stack);
     return node;
   }
   else if(myToken->tokenName == "LOOP_tk") {
-    node->child1 = loop(myToken);
+    node->child1 = loop(myToken, stack);
     return node;
   }
   else if(myToken->tokenName == "ID_tk") {
-    node->child1 = assign(myToken);
+    node->child1 = assign(myToken, stack);
     return node;
   }
   else if(myToken->tokenName == "BEGIN_tk") {
-    node->child1 = block(myToken);
+    node->child1 = block(myToken, stack);
     return node;
   }
   else {
@@ -453,7 +453,7 @@ Node *stat(struct token *myToken) {
   }
 }
 
-Node *in(struct token *myToken) {
+Node *in(struct token *myToken, Stack *stack) {
   Node *node = new Node;
   initNode(node, "<in>");
   scanner(myToken);
@@ -482,13 +482,13 @@ Node *in(struct token *myToken) {
   }
 }
 
-Node *out(struct token *myToken) {
+Node *out(struct token *myToken, Stack *stack) {
   Node *node = new Node;
   initNode(node, "<out>");
   scanner(myToken);
   if(myToken->tokenName == "OPENBRACES_tk") {
     scanner(myToken);
-    node->child1 = expr(myToken);
+    node->child1 = expr(myToken, stack);
     if(myToken->tokenName == "CLOSEBRACES_tk") {
       scanner(myToken);
       if(myToken->tokenName == "PERIOD_tk") {
@@ -511,18 +511,18 @@ Node *out(struct token *myToken) {
   }
 }
 
-Node *ifs(struct token *myToken) {
+Node *ifs(struct token *myToken, Stack *stack) {
   Node *node = new Node;
   initNode(node, "<if>");
   scanner(myToken);
-  node->child1 = expr(myToken);
-  node->child2 = RO(myToken);
-  node->child3 = expr(myToken);
+  node->child1 = expr(myToken, stack);
+  node->child2 = RO(myToken, stack);
+  node->child3 = expr(myToken, stack);
   if(myToken->tokenName == "CLOSEBRACES_tk") {
     scanner(myToken);
     if(myToken->tokenName == "IFF_tk") {
       scanner(myToken);
-      node->child4 = block(myToken);
+      node->child4 = block(myToken, stack);
       return node;
     }
     else {
@@ -536,18 +536,18 @@ Node *ifs(struct token *myToken) {
   }
 }
 
-Node *loop(struct token *myToken) {
+Node *loop(struct token *myToken, Stack *stack) {
   Node *node = new Node;
   initNode(node, "<loop>");
   scanner(myToken);
   if(myToken->tokenName == "OPENBRACES_tk") {
     scanner(myToken);
-    node->child1 = expr(myToken);
-    node->child2 = RO(myToken);
-    node->child3 = expr(myToken);
+    node->child1 = expr(myToken, stack);
+    node->child2 = RO(myToken, stack);
+    node->child3 = expr(myToken, stack);
     if(myToken->tokenName == "CLOSEBRACES_tk") {
       scanner(myToken);
-      node->child4 = block(myToken);
+      node->child4 = block(myToken, stack);
       return node;
     }
     else {
@@ -561,7 +561,7 @@ Node *loop(struct token *myToken) {
   }
 }
 
-Node *assign(struct token *myToken) {
+Node *assign(struct token *myToken, Stack *stack) {
   Node *node = new Node;
   initNode(node, "<assign>");
   node->token1 = returnInstance(myToken);
@@ -569,7 +569,7 @@ Node *assign(struct token *myToken) {
   if(myToken->tokenName == "EQUALTO_tk") {
     node->token2 = returnInstance(myToken);
     scanner(myToken);
-    node->child1 = expr(myToken);
+    node->child1 = expr(myToken, stack);
     if(myToken->tokenName == "PERIOD_tk") {
       scanner(myToken);
       return node;
@@ -585,7 +585,7 @@ Node *assign(struct token *myToken) {
   }
 }
 
-Node *RO(struct token *myToken) {
+Node *RO(struct token *myToken, Stack *stack) {
   Node *node = new Node;
   initNode(node, "<RO>");
   if(myToken->tokenName == "GREATEREQUALS_tk" || myToken->tokenName == "LESSEQUALS_tk" || myToken->tokenName == "EQUALS_tk" ||

@@ -1,7 +1,7 @@
 objects = Main.o Scanner.o treePrint.o
 
-testScanner: $(objects)
-	g++ -g -o testScanner $(objects)
+testSem: $(objects)
+	g++ -g -o testSem $(objects)
 Main.o: Main.cpp Token.h Scanner.h
 	g++ -g -c Main.cpp
 Scanner.o: Scanner.cpp Token.h Scanner.h treePrint.h
@@ -11,4 +11,4 @@ treePrint.o: treePrint.cpp treePrint.h
 
 .PHONY: clean
 clean:
-	-rm testScanner $(objects) *.out
+	-rm testSem $(objects) *.out

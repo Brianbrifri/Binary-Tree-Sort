@@ -1,7 +1,7 @@
 *.o
 *.swp
 a.out
-testScanner
+testSem
 .idea/**/*
 *.out
 *.fs16
