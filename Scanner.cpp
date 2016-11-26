@@ -225,8 +225,12 @@ Node *program(struct token *myToken, Stack *stack) {
   Node *node = new Node;
   initNode(node, "<program>");
   int varCount = 0;
-  node->child1 = vars(myToken, stack);
+  node->child1 = vars(myToken, stack, varCount);
   node->child2 = block(myToken, stack);
+  cout << endl;
+  for(int i = 1; i <= varCount; i++) {
+    stack->pop();
+  }
   return node;
 }
 
@@ -236,10 +240,14 @@ Node *block(struct token *myToken, Stack *stack) {
   int varCount = 0;
   if(myToken->tokenName == "BEGIN_tk") {
     scanner(myToken);
-    node->child1 = vars(myToken, stack);
+    node->child1 = vars(myToken, stack, varCount);
     node->child2 = stats(myToken, stack);
     if(myToken->tokenName == "END_tk") {
       scanner(myToken);
+      cout << endl;
+      for(int i = 1; i <= varCount; i++) {
+        stack->pop();
+      }
       return node;
     }
     else {
@@ -254,15 +262,26 @@ Node *block(struct token *myToken, Stack *stack) {
   
 }
 
-Node *vars(struct token *myToken, Stack *stack) {
+Node *vars(struct token *myToken, Stack *stack, int &varCount) {
   Node *node = new Node;
   initNode(node, "<vars>");
   if(myToken->tokenName == "VAR_tk") {
     scanner(myToken);
     if(myToken->tokenName == "ID_tk") {
       node->token1 = returnInstance(myToken);
+      int location = stack->find(myToken->matchingString);
+      if(location == -1 || location > varCount) {
+        cout << "Good declaration of " << myToken->matchingString << endl << endl;
+        stack->push(myToken->matchingString);
+        varCount++;
+      }
+      else {
+        cout << "Redeclaration of " << myToken->matchingString << ". Exiting.\n";
+        exit(-1);
+      }
+
       scanner(myToken);
-      node->child1 = mvars(myToken, stack);
+      node->child1 = mvars(myToken, stack, varCount);
       return node;
     }
     else {
@@ -277,7 +296,7 @@ Node *vars(struct token *myToken, Stack *stack) {
   }
 }
 
-Node *mvars(struct token *myToken, Stack *stack) {
+Node *mvars(struct token *myToken, Stack *stack, int &varCount) {
   Node *node = new Node;
   initNode(node, "<mvars>");
   if(myToken->tokenName == "COLON_tk") {
@@ -286,8 +305,20 @@ Node *mvars(struct token *myToken, Stack *stack) {
       scanner(myToken);
       if(myToken->tokenName == "ID_tk") {
         node->token1 = returnInstance(myToken);
+
+        int location = stack->find(myToken->matchingString);
+        if(location == -1 || location > varCount) {
+          cout << "Good declaration of " << myToken->matchingString << endl << endl;
+          stack->push(myToken->matchingString);
+          varCount++;
+        }
+        else {
+          cout << "Redeclaration of " << myToken->matchingString << ". Exiting.\n";
+          exit(-1);
+        }
+
         scanner(myToken);
-        node->child1 = mvars(myToken, stack);
+        node->child1 = mvars(myToken, stack, varCount);
         return node;
       }
       else {

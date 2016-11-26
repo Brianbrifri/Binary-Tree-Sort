@@ -13,13 +13,11 @@ class Stack {
       Node *next;
     };
 
-
     Node *top;
 
   public:
     Stack() {
       top = NULL;
-      top->next = NULL;
     }
     void push(string);
     void pop(void);
