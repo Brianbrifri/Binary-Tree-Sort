@@ -269,7 +269,10 @@ Node *vars(struct token *myToken, Stack *stack, int &varCount) {
     scanner(myToken);
     if(myToken->tokenName == "ID_tk") {
       node->token1 = returnInstance(myToken);
-      int location = stack->find(myToken->matchingString);
+      int location = 1;
+      if(varCount > 0) {
+        location = stack->find(myToken->matchingString);
+      }
       if(location == -1 || location > varCount) {
         cout << "Good declaration of " << myToken->matchingString << endl << endl;
         stack->push(myToken->matchingString);
@@ -306,7 +309,10 @@ Node *mvars(struct token *myToken, Stack *stack, int &varCount) {
       if(myToken->tokenName == "ID_tk") {
         node->token1 = returnInstance(myToken);
 
-        int location = stack->find(myToken->matchingString);
+        int location = 1;
+        if(varCount > 0) {
+          location = stack->find(myToken->matchingString);
+        }
         if(location == -1 || location > varCount) {
           cout << "Good declaration of " << myToken->matchingString << endl << endl;
           stack->push(myToken->matchingString);
@@ -416,6 +422,12 @@ Node *R(struct token *myToken, Stack *stack) {
     }
   }
   else if(myToken->tokenName == "ID_tk" || myToken->tokenName == "DIGIT_tk") {
+    if(myToken->tokenName == "ID_tk") {
+      if(stack->find(myToken->matchingString) == -1) {
+        cout << myToken->matchingString << " not declared" <<endl;
+        exit(-1);
+      }
+    }
     node->token1 = returnInstance(myToken);
     scanner(myToken);
     return node;
@@ -491,6 +503,10 @@ Node *in(struct token *myToken, Stack *stack) {
   if(myToken->tokenName == "COLON_tk") {
     scanner(myToken);
     if(myToken->tokenName == "ID_tk") {
+      if(stack->find(myToken->matchingString) == -1) {
+        cout << myToken->matchingString << " not declared" <<endl;
+        exit(-1);
+      }
       node->token1 = returnInstance(myToken);
       scanner(myToken);
       if(myToken->tokenName == "PERIOD_tk") {
@@ -595,6 +611,10 @@ Node *loop(struct token *myToken, Stack *stack) {
 Node *assign(struct token *myToken, Stack *stack) {
   Node *node = new Node;
   initNode(node, "<assign>");
+    if(stack->find(myToken->matchingString) == -1) {
+      cout << myToken->matchingString << " not declared" <<endl;
+      exit(-1);
+    }
   node->token1 = returnInstance(myToken);
   scanner(myToken);
   if(myToken->tokenName == "EQUALTO_tk") {
