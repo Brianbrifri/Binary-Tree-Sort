@@ -4,11 +4,15 @@ using namespace std;
 string fileName, line, inputString;
 char myChar;
 fstream file;
+ofstream fileOut;
 string extension = ".fs16";
 string preName = "out";
 int currentLineNumber = 1;
 int currentColumnNumber = 1;
 int locationInString = 0;
+int tempCount = 0;
+int maxTemp = 0;
+int labelCount = 0;
 
 int processData(char *argv[], int argc) {
 
@@ -67,7 +71,6 @@ int processData(char *argv[], int argc) {
                 } while((int) myChar != WHITESPACE_CHARACTER);
             }
 
-            //cout << myChar;
             //Add all valid characters to the string
             //Do not accept the last character in the comment string
             //if comment goes until eof
@@ -135,14 +138,12 @@ int scan(string fileName) {
   Node *root = new Node;
   Stack *stack = new Stack();
 
-  fileName = fileName + ".out";
+  fileName = fileName + ".asm";
   scanner(myToken);
+  fileOut.open(fileName.c_str());
   root = program(myToken, stack);
+  fileOut.close();
 
-  ofstream file;
-  file.open(fileName.c_str());
-  cout << endl << endl;
-  printTree(root, 0, file);
   return 0;
 }
 
@@ -165,7 +166,6 @@ void scanner(struct token* myToken) {
      state = stateTable[state][getCharacterColumn(inputString[locationInString])]; 
       if(state >= 1000) {
           currentTokenString = cleanTokenString(currentTokenString);
-          cout << currentTokenString << " ";
           if(stateIsIdent(state)) {
               state = matchIdToKeyword(currentTokenString);
           }
@@ -227,9 +227,13 @@ Node *program(struct token *myToken, Stack *stack) {
   int varCount = 0;
   node->child1 = vars(myToken, stack, varCount);
   node->child2 = block(myToken, stack);
-  cout << endl;
   for(int i = 1; i <= varCount; i++) {
     stack->pop();
+    fileOut << "POP\n";
+  }
+  fileOut << "STOP\n";
+  for(int i = 1; i <= maxTemp; i++) {
+    fileOut << "temp" << i << " 0\n"; 
   }
   return node;
 }
@@ -244,9 +248,9 @@ Node *block(struct token *myToken, Stack *stack) {
     node->child2 = stats(myToken, stack);
     if(myToken->tokenName == "END_tk") {
       scanner(myToken);
-      cout << endl;
       for(int i = 1; i <= varCount; i++) {
         stack->pop();
+        fileOut << "POP\n";
       }
       return node;
     }
@@ -270,9 +274,12 @@ Node *vars(struct token *myToken, Stack *stack, int &varCount) {
     if(myToken->tokenName == "ID_tk") {
       node->token1 = returnInstance(myToken);
       int location = stack->find(myToken->matchingString);
-      if(location == -1 || location > varCount) {
-        cout << "Good declaration of " << myToken->matchingString << endl << endl;
+      if(varCount == 0 || location == -1 || location > varCount) {
         stack->push(myToken->matchingString);
+        fileOut << "PUSH\n";
+        if(location == -1) {
+          fileOut << myToken->matchingString << " 0\n";
+        }
         varCount++;
       }
       else {
@@ -307,9 +314,12 @@ Node *mvars(struct token *myToken, Stack *stack, int &varCount) {
         node->token1 = returnInstance(myToken);
 
         int location = stack->find(myToken->matchingString);
-        if(location == -1 || location > varCount) {
-          cout << "Good declaration of " << myToken->matchingString << endl << endl;
+        if(varCount == 0 || location == -1 || location > varCount) {
           stack->push(myToken->matchingString);
+          fileOut << "PUSH\n";
+          if(location == -1) {
+            fileOut << myToken->matchingString << " 0\n"; 
+          }
           varCount++;
         }
         else {
@@ -346,6 +356,9 @@ Node *expr(struct token *myToken, Stack *stack) {
     node->token1 = returnInstance(myToken);
     scanner(myToken);
     node->child2 = expr(myToken, stack);
+    fileOut << "LOAD temp" << tempCount - 1 << endl;
+    fileOut << "ADD temp" << tempCount-- << endl;
+    fileOut << "STORE temp" << tempCount << endl;
     return node;
   }
   else {
@@ -362,6 +375,9 @@ Node *M(struct token *myToken, Stack *stack) {
     node->token1 = returnInstance(myToken);
     scanner(myToken);
     node->child2 = M(myToken, stack);
+    fileOut << "LOAD temp" << tempCount - 1 << endl;
+    fileOut << "SUB temp" << tempCount-- << endl;
+    fileOut << "STORE temp" << tempCount << endl;
     return node;
   }
   else {
@@ -377,6 +393,14 @@ Node *T(struct token *myToken, Stack *stack) {
     node->token1 = returnInstance(myToken);
     scanner(myToken);
     node->child2 = T(myToken, stack);
+    fileOut << "LOAD temp" << tempCount - 1 << endl; 
+    if(node->token1.tokenName == "MULTIPLY_tk") {
+      fileOut << "MULT temp" << tempCount-- << endl;
+    }
+    if(node->token1.tokenName == "DIVIDE_tk") {
+      fileOut << "DIV temp" << tempCount-- << endl;
+    }
+    fileOut << "STORE temp" << tempCount << endl;
     return node;
   }
   else {
@@ -392,6 +416,13 @@ Node *F(struct token *myToken, Stack *stack) {
     node->token1 = returnInstance(myToken);
     scanner(myToken);
     node->child1 = F(myToken, stack);
+    fileOut << "LOAD temp" << tempCount << endl;
+    fileOut << "MULT 2\n";
+    fileOut << "STORE temp" << ++tempCount << endl;
+    updateMaxTemp(tempCount);
+    fileOut << "LOAD temp" << tempCount - 1 << endl;
+    fileOut << "SUB temp" << tempCount << endl;
+    fileOut << "STORE temp" << --tempCount << endl;
     return node;
   }
   else {
@@ -415,8 +446,26 @@ Node *R(struct token *myToken, Stack *stack) {
       exit(-1);
     }
   }
-  else if(myToken->tokenName == "ID_tk" || myToken->tokenName == "DIGIT_tk") {
+  else if(myToken->tokenName == "ID_tk") {
     node->token1 = returnInstance(myToken);
+    int location;
+    if((location = stack->find(myToken->matchingString)) > -1) {
+      fileOut << "STACKR " << location << endl;
+      fileOut << "STORE temp" << ++tempCount << endl;
+      updateMaxTemp(tempCount);
+    }
+    else {
+      cout << "Var " << myToken->matchingString << " not defined\n";
+      exit(-1);
+    }
+    scanner(myToken);
+    return node;
+  }
+  else if (myToken->tokenName == "DIGIT_tk") {
+    node->token1 = returnInstance(myToken);
+    fileOut << "LOAD " << myToken->matchingString << endl;
+    fileOut << "STORE temp" << ++tempCount << endl;
+    updateMaxTemp(tempCount);
     scanner(myToken);
     return node;
   }
@@ -492,6 +541,15 @@ Node *in(struct token *myToken, Stack *stack) {
     scanner(myToken);
     if(myToken->tokenName == "ID_tk") {
       node->token1 = returnInstance(myToken);
+      int location;
+      if((location = stack->find(myToken->matchingString)) > -1) {
+        fileOut << "READ " << myToken->matchingString << endl;
+        fileOut << "LOAD " << myToken->matchingString << endl;
+        fileOut << "STACKW " << location << endl;
+      }
+      else {
+        cout << "Var " << myToken->matchingString << " not defined\n";
+      }
       scanner(myToken);
       if(myToken->tokenName == "PERIOD_tk") {
         scanner(myToken);
@@ -520,6 +578,7 @@ Node *out(struct token *myToken, Stack *stack) {
   if(myToken->tokenName == "OPENBRACES_tk") {
     scanner(myToken);
     node->child1 = expr(myToken, stack);
+    fileOut << "WRITE temp" << tempCount-- << endl;
     if(myToken->tokenName == "CLOSEBRACES_tk") {
       scanner(myToken);
       if(myToken->tokenName == "PERIOD_tk") {
@@ -552,8 +611,33 @@ Node *ifs(struct token *myToken, Stack *stack) {
   if(myToken->tokenName == "CLOSEBRACES_tk") {
     scanner(myToken);
     if(myToken->tokenName == "IFF_tk") {
+      
+      fileOut << "LOAD temp" << tempCount - 1 << endl;
+      fileOut << "SUB temp" << tempCount-- << endl;
+
+      if(node->child2->token1.tokenName == "GREATERTHAN_tk") {
+        fileOut << "BRZNEG out" << labelCount << endl;
+      }
+      else if(node->child2->token1.tokenName == "LESSTHAN_tk") {
+        fileOut << "BRZPOS out" << labelCount << endl;
+      }
+      else if(node->child2->token1.tokenName == "EQUALS_tk") {
+        fileOut << "BRPOS out" << labelCount << endl;
+        fileOut << "BRNEG out" << labelCount << endl;
+      }
+      else if(node->child2->token1.tokenName == "GREATEREQUALS_tk") {
+        fileOut << "BRNEG out" << labelCount << endl;
+      }
+      else if(node->child2->token1.tokenName == "LESSEQUALS_tk") {
+        fileOut << "BRPOS out" << labelCount << endl;
+      }
+      else if(node->child2->token1.tokenName == "NOTEQUALTO_tk") {
+        fileOut << "BRZERO out" << labelCount << endl;
+      }
+
       scanner(myToken);
       node->child4 = block(myToken, stack);
+      fileOut << "out" << labelCount++ << ": NOOP\n";
       return node;
     }
     else {
@@ -573,12 +657,38 @@ Node *loop(struct token *myToken, Stack *stack) {
   scanner(myToken);
   if(myToken->tokenName == "OPENBRACES_tk") {
     scanner(myToken);
+    fileOut << "loop" << labelCount << ": NOOP\n";
     node->child1 = expr(myToken, stack);
     node->child2 = RO(myToken, stack);
     node->child3 = expr(myToken, stack);
     if(myToken->tokenName == "CLOSEBRACES_tk") {
       scanner(myToken);
+      fileOut << "LOAD temp" << tempCount - 1 << endl;
+      fileOut << "SUB temp" << tempCount-- << endl;
+
+      if(node->child2->token1.tokenName == "GREATERTHAN_tk") {
+        fileOut << "BRZNEG out" << labelCount << endl;
+      }
+      else if(node->child2->token1.tokenName == "LESSTHAN_tk") {
+        fileOut << "BRZPOS out" << labelCount << endl;
+      }
+      else if(node->child2->token1.tokenName == "EQUALS_tk") {
+        fileOut << "BRPOS out" << labelCount << endl;
+        fileOut << "BRNEG out" << labelCount << endl;
+      }
+      else if(node->child2->token1.tokenName == "GREATEREQUALS_tk") {
+        fileOut << "BRNEG out" << labelCount << endl;
+      }
+      else if(node->child2->token1.tokenName == "LESSEQUALS_tk") {
+        fileOut << "BRPOS out" << labelCount << endl;
+      }
+      else if(node->child2->token1.tokenName == "NOTEQUALTO_tk") {
+        fileOut << "BRZERO out" << labelCount << endl;
+      }
+
       node->child4 = block(myToken, stack);
+      fileOut << "BR loop" << labelCount << endl;
+      fileOut << "out" << labelCount++ << ": NOOP\n";
       return node;
     }
     else {
@@ -601,6 +711,11 @@ Node *assign(struct token *myToken, Stack *stack) {
     node->token2 = returnInstance(myToken);
     scanner(myToken);
     node->child1 = expr(myToken, stack);
+    fileOut << "LOAD temp" << tempCount-- << endl;
+    int location;
+    if((location = stack->find(node->token1.matchingString)) > -1) {
+      fileOut << "STACKW " << location << endl;      
+    }
     if(myToken->tokenName == "PERIOD_tk") {
       scanner(myToken);
       return node;
@@ -629,6 +744,10 @@ Node *RO(struct token *myToken, Stack *stack) {
     cout << "Expected relational operator on line " << myToken->lineNumber << endl;
     exit(-1);
   }
+}
+
+void updateMaxTemp(int currentTempCount) {
+  if (currentTempCount > maxTemp) maxTemp = currentTempCount;
 }
 
 struct token returnInstance(struct token *myToken) {

@@ -5,3 +5,4 @@ testSem
 .idea/**/*
 *.out
 *.fs16
+*.asm

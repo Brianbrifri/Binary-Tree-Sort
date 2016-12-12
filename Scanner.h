@@ -11,6 +11,7 @@
 //Main functions of Scanner
 int processData(char*[], int);
 int scan(std::string);
+void updateMaxTemp(int);
 
 //Token functions
 void scanner(struct token*);

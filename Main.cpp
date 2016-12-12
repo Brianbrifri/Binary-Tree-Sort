@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
             cout << "Exiting due to file open error\n";
             exit(FILE_ERROR);
         case 0:
-            cout << "Program exiting normally\n";
+            cout << "Parsing OK. Program exiting normally\n";
             break;
         default:
             cout << "Shouldn't reach here\n";

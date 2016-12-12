@@ -1,4 +1,0 @@
-Var stew::rob::bleh 
-Begin Var rob::a::b
-Scan:blob.Print[88].
-End 
